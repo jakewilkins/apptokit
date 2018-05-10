@@ -1,0 +1,4 @@
+---
+private_key_path_glob: ~/Downloads/best-app.*.pem
+installation_id: 10000000000
+app_id: 8675309

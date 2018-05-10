@@ -1,0 +1,14 @@
+#!/bin/bash
+
+set -e
+# set -x
+
+ruby=`which ruby`
+
+cmd="$ruby -r$APPTOKIT_RUBY_SHARE_PATH/setup -e 'print Apptokit.config.private_key_path'"
+# echo "$cmd"
+# path=$($cmd)
+path=$($ruby -r$APPTOKIT_RUBY_SHARE_PATH/setup -e 'print Apptokit.config.private_key_path')
+echo "Fingerprinting path $path"
+
+openssl rsa -in $path -pubout -outform DER | openssl sha1 -c

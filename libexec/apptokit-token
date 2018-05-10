@@ -1,0 +1,14 @@
+#!/usr/bin/env ruby
+
+require "setup"
+require "apptokit/installation_token"
+
+token = Apptokit::InstallationToken.generate
+
+if $stdout.isatty
+  puts "Your token:"
+  puts token.token
+  puts "expires at: #{token.expires_at}"
+else
+  print token.header
+end

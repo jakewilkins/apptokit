@@ -1,0 +1,12 @@
+#!/usr/bin/env ruby
+
+require "setup"
+require "apptokit/jwt"
+
+jwt = Apptokit::JWT.generate
+
+if $stdout.isatty
+  puts "Your JWT: \n#{jwt.token}"
+else
+  print jwt.token
+end
