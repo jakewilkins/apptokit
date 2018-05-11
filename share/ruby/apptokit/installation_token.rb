@@ -24,10 +24,14 @@ module Apptokit
     end
 
     def generate
-      response = Net::HTTP.post(installation_token_url, "", {
-        "Accept"        => "application/vnd.github.machine-man-preview+json",
-        "Authorization" => jwt.header
-      })
+      uri = URI(installation_token_url)
+      request = Net::HTTP::Post.new(uri)
+      request["Accept"] = "application/vnd.github.machine-man-preview+json"
+      request["Authorization"] = jwt.header
+
+      response = Net::HTTP.start(uri.hostname, uri.port) do |http|
+        http.request(request)
+      end
 
       case response
       when Net::HTTPSuccess then
