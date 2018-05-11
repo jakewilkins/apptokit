@@ -1,4 +1,8 @@
 #!/usr/bin/env ruby
+# Usage: apptokit app-token
+# Summary: Generate a JWT for your GitHub App
+# Help:
+#   Pulls from the .apptokit.yaml file.
 
 require "setup"
 require "apptokit/jwt"
@@ -8,5 +12,5 @@ jwt = Apptokit::JWT.generate
 if $stdout.isatty
   puts "Your JWT: \n#{jwt.token}"
 else
-  print jwt.token
+  print "Bearer #{jwt.token}"
 end

@@ -1,14 +1,22 @@
 #!/bin/bash
+# Usage: apptokit fingerprint [path to private key]
+# Summary: Fingerprint the currently selected GitHub App private key.
+# Help:
+#   Useful for helping to check that the private key file selected is valid for the
+#   App you're working with.
+#
+#   Compare the output here with the fingerprint found on the GitHub App settings page.
 
 set -e
 # set -x
 
-ruby=`which ruby`
-
-cmd="$ruby -r$APPTOKIT_RUBY_SHARE_PATH/setup -e 'print Apptokit.config.private_key_path'"
-# echo "$cmd"
-# path=$($cmd)
-path=$($ruby -r$APPTOKIT_RUBY_SHARE_PATH/setup -e 'print Apptokit.config.private_key_path')
+if [[ -z "$1" ]]; then
+  ruby=`which ruby`
+  cmd="$ruby -r$APPTOKIT_RUBY_SHARE_PATH/setup -e 'print Apptokit.config.private_key_path'"
+  path=$($ruby -r$APPTOKIT_RUBY_SHARE_PATH/setup -e 'print Apptokit.config.private_key_path')
+else
+  path="$1"
+fi
 echo "Fingerprinting path $path"
 
 openssl rsa -in $path -pubout -outform DER | openssl sha1 -c

@@ -1,0 +1,56 @@
+#!/bin/bash
+# Usage: apptokit <authentication type> [request method] path/of/request [curl opts]
+# Summary: Perform a curl command authenticated as a GitHub App.
+# Help:
+#  <authentication type> should be one of:"
+#     - app:           Perform a request using the GitHub App JWT to authenticate."
+#     - installation:  Perform a Server-Server request as a GitHub App installation."
+#     - user:          Perform a User-Server request. Note: this might require browser interaction."
+#
+#  [request method] can be used to specify the HTTP request method, or you can always set it in Curl opts"
+#
+#  Any options passed after the path of your request will be forwarded on to the Curl command.
+
+set -e
+
+# set -x
+
+if [[ "$1" == "--help" || "$1" == "-h" ]]; then
+  echo "usage: $0 "
+  echo
+fi
+
+PREVIEW_HEADER="application/vnd.github.machine-man-preview+json"
+
+request_type=$1
+shift
+
+request_types=("get" "post" "put" "patch" "delete" "GET" "POST" "PUT" "PATCH" "DELETE")
+
+if [[ " ${request_types[@]} " =~ " ${1} " ]]; then
+  request_method="-X $(echo $1 | tr "[:lower:]" "[:upper:]")"
+  shift
+fi
+
+path=$1
+shift
+
+case "$request_type" in
+  "user")
+    auth="$(apptokit user-token)"
+    ;;
+  "installation")
+    auth="$(apptokit installation-token)"
+    ;;
+  "app")
+    auth="$(apptokit app-token)"
+    ;;
+esac
+
+github_url=`ruby -rsetup -e "print Apptokit.config.github_url"`
+
+if [[ "$path" != *http* ]]; then
+  path="$github_url/$path"
+fi
+
+curl $request_method -H "Authorization: $auth" -H "Accept: $PREVIEW_HEADER" $@ $path
