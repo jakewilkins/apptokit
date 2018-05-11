@@ -9,6 +9,7 @@ Usage: apptokit <command> [<args>]
 Some useful apptokit commands are:
    fingerprint         Fingerprint the currently selected GitHub App private key.
    app-token           Generate a JWT for your GitHub App
+   user-token          Generate an User-Server token for a GitHub App installation.
    installation-token  Generate an installation token for a GitHub App installation.
    curl                Perform a curl command authenticated as a GitHub App.
    commands            List all apptokit commands

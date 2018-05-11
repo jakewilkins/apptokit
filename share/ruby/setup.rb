@@ -6,16 +6,7 @@ require 'yaml'
 require 'uri'
 
 module Apptokit
-  RUBY_SHARE_DIR = Pathname.new(ENV["APPTOKIT_RUBY_SHARE_PATH"])
-  RUBY_VENDOR_DIR = RUBY_SHARE_DIR.join("vendor")
-
   ApptokitError = Class.new(RuntimeError)
-
-  module_function
-
-  def env
-    ENV["GITHUB_ENV"] || "dev"
-  end
 
   class Configuration
     HOME_DIR_CONF_PATH = Pathname.new(ENV["HOME"]).join(".config/apptokit.yaml")
@@ -28,14 +19,26 @@ module Apptokit
       webhook_secret
       installation_id
       github_url
+
+      client_id
+      client_secret
+      oauth_callback_port
+      oauth_callback_bind
+      oauth_callback_path
+      oauth_callback_hostname
     )
 
     DEFAULT_GITHUB_URL = URI("https://api.github.com")
 
     attr_accessor :app_id, :webhook_secret, :installation_id
+    attr_accessor :client_id, :client_secret, :oauth_callback_port, :oauth_callback_bind, :oauth_callback_path, :oauth_callback_hostname
     attr_writer :private_key_path_glob
 
     def initialize
+      reload!
+    end
+
+    def reload!
       set_opts_from_yaml(HOME_DIR_CONF_PATH)
       set_opts_from_yaml(PROJECT_DIR_CONF_PATH)
       set_opts_from_env
@@ -95,6 +98,8 @@ module Apptokit
       end)
     end
   end
+
+  module_function
 
   def config
     return @config if defined?(@config) && !block_given?

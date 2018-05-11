@@ -1,0 +1,37 @@
+#!/usr/bin/env ruby
+# Usage: apptokit user-token [--no-auto-open]
+# Summary: Generate an User-Server token for a GitHub App installation.
+# Help: This command will attempt to auto generate a User authenticated token for a GitHub App.
+#
+# NOTE: This requires using your browser and specific configuration of your GitHub App.
+#
+#  This generates a token by walking your browser through the OAuth flow and grabbing the OAuth
+#  provided.
+#
+#  Your App must have a Callback URL specified in you Application settings that
+#  is specified by the Apptokit options:
+#
+#     - oauth_callback_port:     defaults to 8075
+#     - oauth_callback_bind:     defaults to localhost
+#     - oauth_callback_path:     defaults to /callback
+#     - oauth_callback_hostname: defaults to localhost
+#
+#  Further, as this authenticates using your browser session the token will be
+#  issued to the User that is logged in in your browser.
+#
+#  This command can auto open your browser (used value in $BROWSER, on MacOS this is `open`)
+#  or if you need it to specify --no-auto-open and it will provide you a URL to open.
+
+require "setup"
+require "apptokit/user_token"
+
+auto_open = ARGV.find { |arg| arg == "--no-auto-open" }
+token = Apptokit::UserToken.generate(auto_open: !auto_open)
+
+if $stdout.isatty
+  puts "Your token:"
+  puts token.token
+  puts "Token type: #{token.token_type}"
+else
+  print token.header
+end
