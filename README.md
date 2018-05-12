@@ -53,7 +53,7 @@ NOTE: this will open your browser. There's a TODO here for caching User-Server t
 and then trying to regenerate if it fails.
 
 ```bash
-apptokit curl user user/installations/15/repositories | jq
+$ apptokit curl user user/installations/15/repositories | jq
 {
 	"total_count": 1,
 		"repositories": [
@@ -61,11 +61,10 @@ apptokit curl user user/installations/15/repositories | jq
 			"id": 534,
 			"name": "fictional-octo-funicular",
 			"full_name": "jakewilkins/fictional-octo-funicular",
-... snip
+      ... snip
 		}
 	]
 }
-i
 ```
 
 Or [creating an Issue Comment](https://developer.github.com/v3/issues/comments/#create-a-comment) as an app and a user, just switching one flag:
