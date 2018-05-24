@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
-# Usage: apptokit user-token [--no-auto-open]
+# Usage: apptokit user-token [--no-auto-open] [oauth code]
 # Summary: Generate an User-Server token for a GitHub App installation.
 # Help: This command will attempt to auto generate a User authenticated token for a GitHub App.
 #
@@ -26,7 +26,20 @@ require "setup"
 require "apptokit/user_token"
 
 auto_open = ARGV.find { |arg| arg == "--no-auto-open" }
-token = Apptokit::UserToken.generate(auto_open: !auto_open)
+code = ARGV.find {|str| str =~ /[a-z0-9]{20}/}
+
+DummyToken = Struct.new(:token) do
+  def header
+    "token #{token}"
+  end
+
+  def token_type
+    "bearer"
+  end
+end
+
+token = ENV["APPTOKIT_USER_TOKEN"] && DummyToken.new(ENV["APPTOKIT_USER_TOKEN"])
+token ||= Apptokit::UserToken.generate(auto_open: !auto_open, code: code)
 
 if $stdout.isatty
   puts "Your token:"
