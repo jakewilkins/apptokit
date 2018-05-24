@@ -23,17 +23,6 @@ fi
 PREVIEW_HEADER="application/vnd.github.machine-man-preview+json"
 
 request_type=$1
-shift
-
-request_types=("get" "post" "put" "patch" "delete" "GET" "POST" "PUT" "PATCH" "DELETE")
-
-if [[ " ${request_types[@]} " =~ " ${1} " ]]; then
-  request_method="-X $(echo $1 | tr "[:lower:]" "[:upper:]")"
-  shift
-fi
-
-path=$1
-shift
 
 case "$request_type" in
   "user")
@@ -45,7 +34,22 @@ case "$request_type" in
   "app")
     auth="$(apptokit app-token)"
     ;;
+  *)
+    echo "You have to specify an authentication type for apptokit curl:"
+    apptokit help curl
+    exit 12
 esac
+shift
+
+request_methods=("get" "post" "put" "patch" "delete" "GET" "POST" "PUT" "PATCH" "DELETE")
+
+if [[ " ${request_methods[@]} " =~ " ${1} " ]]; then
+  request_method="-X $(echo $1 | tr "[:lower:]" "[:upper:]")"
+  shift
+fi
+
+path=$1
+shift
 
 github_url=`ruby -rsetup -e "print Apptokit.config.github_url"`
 
