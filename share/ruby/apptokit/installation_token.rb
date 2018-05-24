@@ -29,7 +29,7 @@ module Apptokit
       request["Accept"] = "application/vnd.github.machine-man-preview+json"
       request["Authorization"] = jwt.header
 
-      response = Net::HTTP.start(uri.hostname, uri.port) do |http|
+      response = Net::HTTP.start(uri.hostname, uri.port, nil, nil, nil, nil, use_ssl: uri.scheme == "https") do |http|
         http.request(request)
       end
 
