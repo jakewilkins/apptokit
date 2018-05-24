@@ -74,6 +74,10 @@ module Apptokit
       @github_url ||= DEFAULT_GITHUB_URL
     end
 
+    def env
+      @env ||= ENV["APPTOKIT_ENV"] || ENV["GH_ENV"]
+    end
+
     private
 
     def set_opts_from_hash(hash)
@@ -88,8 +92,14 @@ module Apptokit
       return unless path.exist?
 
       yaml = YAML.load(path.read)
-
       set_opts_from_hash(yaml)
+
+      @env = yaml["default_env"] unless env
+
+      if env
+        env_overrides = yaml[env]
+        set_opts_from_hash(env_overrides) if env_overrides
+      end
     end
 
     def set_opts_from_env
