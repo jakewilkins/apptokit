@@ -9,8 +9,9 @@ module Apptokit
   ApptokitError = Class.new(RuntimeError)
 
   class Configuration
-    HOME_DIR_CONF_PATH = Pathname.new(ENV["HOME"]).join(".config/apptokit.yaml")
-    PROJECT_DIR_CONF_PATH = Pathname.new(Dir.pwd).join(".apptokit.yaml")
+    HOME_DIR_CONF_PATH = Pathname.new(ENV["HOME"]).join(".config/apptokit.yml")
+    PROJECT_DIR_CONF_PATH = Pathname.new(Dir.pwd).join(".apptokit.yml")
+    SHARE_DIR = Pathname.new(__FILE__).dirname.dirname
 
     YAML_OPTS = %w(
       private_key_path

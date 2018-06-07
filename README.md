@@ -30,8 +30,8 @@ I'm not super happy with that process, but I wanted something slightly less Ruby
 a Ruby gem. While this does use Ruby, it's only non-standarb-library dependency is 
 vendored in `share/` and all Ruby code runs under the Ruby version that ships with MacOS.
 
-Options set from .apptokit.yaml, with a default loaded from ~/config/apptokit.yaml,
-checkout apptokit.yaml.example for options.
+Options set from .apptokit.yml, with a default loaded from ~/config/apptokit.yml,
+checkout apptokit.yml.example for options.
 
 
 ### Examples
