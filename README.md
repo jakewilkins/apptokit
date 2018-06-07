@@ -24,7 +24,7 @@ and it seems like the installation instructions are:
 
 1. Clone this repo
 2. Either put `bin` in your path or
-3. Add the output of `apptokit init` to your shell config.
+3. Add the output of `apptokit shell-setup` to your shell config.
 
 I'm not super happy with that process, but I wanted something slightly less Ruby centric than
 a Ruby gem. While this does use Ruby, it's only non-standarb-library dependency is 
