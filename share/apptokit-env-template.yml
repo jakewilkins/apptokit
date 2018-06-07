@@ -1,0 +1,8 @@
+
+<%= env %>:
+  <<: *test_defaults
+  private_key_path_glob: <%= "#{ENV["HOME"]}/Downloads/#{env}-app-*.pem" %>
+  installation_id: 
+  app_id: 
+  client_id:
+  client_secret:

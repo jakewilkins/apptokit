@@ -1,94 +1,90 @@
-#!/usr/bin/env bash
-set -e
+#!/usr/bin/env ruby
+# Usage: apptokit init <path> [--env=env]
+# Summary: Generate a .apptokit.yml or add a new App environment
+# Help: This command will provide you with a starting point to use Apptokit,
+# Or, if you're already up and running will provide you with a template for adding
+# a new Apptokit environment.
+#
+#
+# Examples:
+#
+#    apptokit init .            # Generates a basic apptokit.yml config
+#    apptokit init . --env test # Will add a "test" environment to your existing
+#                                 config or generate a config with a test environment
+require "setup"
+require "pathname"
+require "yaml"
+require "fileutils"
+require "erb"
 
-print=""
-if [ "$1" = "-" ]; then
-  print=1
-  shift
-fi
+dir = ARGV.shift
 
-shell="$1"
-if [ -z "$shell" ]; then
-  shell="$(basename "$SHELL")"
-fi
+if dir == "."
+  dir = Dir.pwd
+end
 
-resolve_link() {
-  $(type -p greadlink readlink | head -1) $1
-}
+if %w(--env -e).include?(dir)
+  env = ARGV.shift
+  dir = ARGV.shift
+else
+  if ARGV.shift
+    env = ARGV.shift
+  end
+end
 
-abs_dirname() {
-  local cwd="$(pwd)"
-  local path="$1"
+dir = Pathname.new(dir)
+yaml_path = dir.join(".apptokit.yml")
+backup_yaml_path = "#{yaml_path}.bac"
 
-  while [ -n "$path" ]; do
-    cd "${path%/*}"
-    local name="${path##*/}"
-    path="$(resolve_link "$name" || true)"
-  done
+existing = yaml_path.exist?
 
-  pwd
-  cd "$cwd"
-}
+if existing && !env
+  print "Overwrite existing config at '#{yaml_path}'? (Y/n) "
+  ans = gets.chomp
+  if ans.upcase != "Y"
+    puts "Not overwriting..."
+    puts `apptokit help init`
+    exit 1
+  else
+    puts "Archiving original to .bac because we ❤️  you..."
+    FileUtils.mv(yaml_path, backup_yaml_path, verbose: true)
 
-root="$(abs_dirname "$0")/.."
+    at_exit do
+      if !yaml_path.exist? && File.exist?(backup_yaml_path)
+        puts "Something went wrong and we're exiting without a .apptokit.yml, attempting to restore backup..."
+        FileUtils.mv(backup_yaml_path, yaml_path, verbose: true)
+      end
+    end
+  end
+end
 
-if [ -z "$print" ]; then
-  case "$shell" in
-  bash )
-    profile='~/.bash_profile'
-    ;;
-  zsh )
-    profile='~/.zshenv'
-    ;;
-  * )
-    profile='your profile'
-    ;;
-  esac
+full_template = Apptokit::Configuration::SHARE_DIR.join("apptokit-full-template.yml")
 
-  { echo "# Load apptokit automatically by adding"
-    echo "# the following to ${profile}:"
-    echo
-    echo "eval \"\$(${_APPTOKIT_ROOT}/bin/apptokit init -)\""
-    echo
-  } >&2
+if !existing
+  puts "Creating .apptokit.yml..."
+  FileUtils.cp(full_template, yaml_path)
+else
+  puts "Updating .apptokit.yml..."
+end
 
-  exit 1
-fi
+if env
+  env_template = Apptokit::Configuration::SHARE_DIR.join("apptokit-env-template.yml")
+  if existing
+    existing_conf = YAML.load_file(yaml_path)
+    if existing_conf.has_key?(env)
+      warn "WARNING: duplicate env '#{env}', this configuration will replace previously existing '#{env}' env when parsed by YAML."
+    end
+  end
 
-echo "export PATH=\"\${PATH}:${_APPTOKIT_ROOT}/bin\""
+  env_out = ERB.new(File.read(env_template)).result(binding)
 
-case "$shell" in
-bash | zsh )
-  echo "source \"$root/completions/apptokit.${shell}\""
-  ;;
-esac
+  File.open(yaml_path, "a+") do |file|
+    file.puts env_out
+  end
+end
+puts "\ndone. Fill in
 
-commands=(`apptokit commands --sh`)
-IFS="|"
-cat <<EOS
-_apptokit_wrapper() {
-  local command="\$1"
-  if [ "\$#" -gt 0 ]; then
-    shift
-  fi
+#{yaml_path}
 
-  case "\$command" in
-  ${commands[*]})
-    eval \`apptokit "sh-\$command" "\$@"\`;;
-  *)
-    command apptokit "\$command" "\$@";;
-  esac
-}
-EOS
-
-# zsh can't pass argument with aliases, but bash can.
-# zsh can have functions with the name being only numbers, but bash can't.
-# fix both cases here by letting zsh have a function, and bash have its alias.
-case "$shell" in
-bash )
-  echo "alias apptokit=_apptokit_wrapper"
-  ;;
-zsh )
-  echo "apptokit=_apptokit_wrapper"
-  ;;
-esac
+with your GitHub App specifics.
+✨"

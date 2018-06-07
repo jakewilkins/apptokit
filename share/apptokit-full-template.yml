@@ -1,0 +1,50 @@
+---
+
+# Specify a default env to use if you have multiple
+default_env: test
+
+test_defaults: &test_defaults
+  # Useful for GitHub Enterprise installations
+  github_url: https://api.github.com
+  # Future versions look forward to using this to look up your installation id.
+  # installation_target: test-org
+
+# Same as test_defaults
+# prod_defaults: &prod_defaults
+  # github_url: https://api.github.com
+  # installation_target: real-org
+
+test:
+  <<: *test_defaults
+  # The ID of your GitHub App. Found on the settings page (labeled "ID")
+  app_id: 42
+
+  # Use this if you find yourself rotating your key often, Apptokit will find
+  # the private key with the latest date.
+  private_key_path_glob: /home/user/downloads/test-app.*.pem
+
+  # The ID of this installation.
+  #
+  # This is found in the event payload of the install event sent to your application,
+  # you can find that event in your app settings, Advanced > Recent Deliveries
+  installation_id: 8675309
+
+  #
+  # OAuth Settings
+  #
+  # Found on your GitHub App settings page.
+  #
+  # Used for generating User to Server tokens.
+  #
+  client_id: Iv1.thisisnotatestid
+  client_secret: 25fthisisnotaclientsecret
+
+# These keys have the same explanation as their test env counterparts.
+# prod:
+  # <<: *prod_defaults
+  # private_key_path_glob: 
+  # installation_id: 
+  # app_id: 8675309
+  # client_id: Iv1.thisisnotanid
+  # client_secret: 25fthisisnotahexclientsecret
+
