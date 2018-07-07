@@ -1,6 +1,7 @@
 #!/bin/bash
 # Usage: apptokit <authentication type> [request method] path/of/request [curl opts]
 # Summary: Perform a curl command authenticated as a GitHub App.
+# provide apptokit completions
 # Help:
 #  <authentication type> should be one of:"
 #     - app:           Perform a request using the GitHub App JWT to authenticate."
@@ -13,6 +14,49 @@
 
 set -e
 
+request_methods=("get" "post" "put" "patch" "delete" "GET" "POST" "PUT" "PATCH" "DELETE")
+request_types=("app" "installation" "user")
+
+if [[ "$1" == "--complete" ]]; then
+
+  request_type="$(echo -e "${2}" | tr -d '[:space:]')" 
+  if [[ ! " ${request_types[@]} " =~ " ${request_type} " ]]; then
+    echo "her: '${2}'" >> .completion_args
+    for i in "${request_types[@]}"; do
+       echo "$i"
+    done
+    exit
+  fi
+
+  request_method="$(echo -e "${3}" | tr -d '[:space:]')" 
+  if [[ ! " ${request_methods[@]} " =~ " ${request_method} " ]]; then
+    echo "GET"
+    echo "POST"
+    echo "PUT"
+    echo "PATCH"
+    echo "DELETE"
+  fi
+
+  if [[ "$OSTYPE" =~ "darwin" ]]; then
+    clipboard_contents=$(pbpaste)
+    http="${clipboard_contents:0:4}"
+
+    if [ "$http" = "http" ]; then
+      echo $clipboard_contents
+    fi
+  fi
+
+  if [[ "$request_type" == "app" ]]; then
+    echo "installations/:installation_id/access_tokens"
+  elif [[ "$request_type" == "installation" ]]; then
+    echo "installation/repositories"
+  elif [[ "$request_type" == "user" ]]; then
+    echo "user/installations"
+  fi
+
+  exit
+fi
+
 # set -x
 
 if [[ "$1" == "--help" || "$1" == "-h" ]]; then
@@ -20,7 +64,7 @@ if [[ "$1" == "--help" || "$1" == "-h" ]]; then
   echo
 fi
 
-PREVIEW_HEADER="application/vnd.github.machine-man-preview+json"
+PREVIEW_HEADER="application/vnd.github.machine-man-preview+json, application/vnd.github.v3.text-match+json"
 
 request_type=$1
 
@@ -41,14 +85,19 @@ case "$request_type" in
 esac
 shift
 
-request_methods=("get" "post" "put" "patch" "delete" "GET" "POST" "PUT" "PATCH" "DELETE")
-
 if [[ " ${request_methods[@]} " =~ " ${1} " ]]; then
   request_method="-X $(echo $1 | tr "[:lower:]" "[:upper:]")"
   shift
 fi
 
 path=$1
+
+if [ -z "$path" ]; then
+  echo "You have to specify a path for apptokit curl:"
+  apptokit help curl
+  exit 13
+fi
+
 shift
 
 github_url=`ruby -rsetup -e "print Apptokit.config.github_url"`
