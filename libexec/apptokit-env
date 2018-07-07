@@ -1,0 +1,47 @@
+#!/usr/bin/env ruby
+# Usage: apptokit env
+# Summary: Provide information about the currently configured GitHub App
+# Help:
+# Displays the configuration settings that would be picked up when running apptokit.
+#
+#   - apptokit env
+#   - github_url
+#   - app_id
+#   - installation_id
+#   - private key path
+#   - webhook_secret
+#   - client_id
+
+require "setup"
+
+values = {}
+conf = Apptokit.config
+
+values["APPTOKIT_ENV"] = conf.env
+values["GitHub URL"] = conf.github_url
+values["App ID"] = conf.app_id
+values["Installation ID"] = conf.installation_id
+values["Private key path"] = conf.private_key_path
+values["Webhook secret"] = conf.webhook_secret.inspect
+values["Client ID"] = conf.client_id
+
+
+def value(padding, name, value)
+  label = "\e[1m#{name}:\e[22m"
+  spaces = " " * (name.length - padding).abs
+  "#{label} #{spaces} #{value}"
+end
+
+
+if $stdout.isatty
+  padding = values.keys.max { |a, b| a.length <=> b.length }.length
+  puts "Apptokit is currently configured to use:"
+
+  values.each do |label, value|
+    puts value(padding, label, value)
+  end
+else
+  require 'json'
+  print values.to_json
+end
+
