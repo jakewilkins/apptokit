@@ -1,14 +1,14 @@
-_shoctokit() {
+_apptokit() {
   COMPREPLY=()
   local word="${COMP_WORDS[COMP_CWORD]}"
 
   if [ "$COMP_CWORD" -eq 1 ]; then
-    COMPREPLY=( $(compgen -W "$(shoctokit commands)" -- "$word") )
+    COMPREPLY=( $(compgen -W "$(apptokit commands)" -- "$word") )
   else
     local command="${COMP_WORDS[1]}"
-    local completions="$(shoctokit completions "$command")"
+    local completions="$(apptokit completions "$command")"
     COMPREPLY=( $(compgen -W "$completions" -- "$word") )
   fi
 }
 
-complete -F _shoctokit shoctokit
+complete -F _apptokit apptokit
