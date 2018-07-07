@@ -33,9 +33,20 @@ module Apptokit
 
     attr_accessor :app_id, :webhook_secret, :installation_id
     attr_accessor :client_id, :client_secret, :oauth_callback_port, :oauth_callback_bind, :oauth_callback_path, :oauth_callback_hostname
-    attr_writer :private_key_path_glob
+    attr_writer :private_key_path_glob, :keycache_file_path, :env
 
-    def initialize
+    def self.environments
+      envs = []
+      [HOME_DIR_CONF_PATH, PROJECT_DIR_CONF_PATH].each do |path|
+        if path.exist?
+          envs += (YAML.load_file(path).keys - YAML_OPTS)
+        end
+      end
+      envs - %w(default_env)
+    end
+
+    def initialize(env = nil)
+      @env = env
       reload!
     end
 

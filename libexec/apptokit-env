@@ -14,34 +14,62 @@
 
 require "setup"
 
-values = {}
-conf = Apptokit.config
-
-values["APPTOKIT_ENV"] = conf.env
-values["GitHub URL"] = conf.github_url
-values["App ID"] = conf.app_id
-values["Installation ID"] = conf.installation_id
-values["Private key path"] = conf.private_key_path
-values["Webhook secret"] = conf.webhook_secret.inspect
-values["Client ID"] = conf.client_id
-
-
 def value(padding, name, value)
   label = "\e[1m#{name}:\e[22m"
   spaces = " " * (name.length - padding).abs
   "#{label} #{spaces} #{value}"
 end
 
+def values(conf)
+  values = {}
+  values["APPTOKIT_ENV"] = conf.env
+  values["GitHub URL"] = conf.github_url
+  values["App ID"] = conf.app_id
+  values["Installation ID"] = conf.installation_id
+  values["Private key path"] = conf.private_key_path
+  values["Webhook secret"] = conf.webhook_secret.inspect
+  values["Client ID"] = conf.client_id
+  values
+end
 
-if $stdout.isatty
+def display(values)
   padding = values.keys.max { |a, b| a.length <=> b.length }.length
-  puts "Apptokit is currently configured to use:"
 
   values.each do |label, value|
     puts value(padding, label, value)
   end
+end
+
+list_envs = (%w(--list -l list) & ARGV).any?
+show_envs = ARGV & Apptokit::Configuration.environments
+
+if $stdout.isatty
+  if list_envs
+    puts "Apptokit knows about these environments:"
+    Apptokit::Configuration.environments.each do |env|
+      puts " - #{env}"
+    end
+  elsif show_envs.any?
+    show_envs.each do |env|
+      puts "Apptokit ENV #{env} will use:"
+      display(values(Apptokit::Configuration.new(env)))
+      puts
+    end
+  else
+    puts "Apptokit is currently configured to use:"
+    display(values(Apptokit.config))
+  end
 else
   require 'json'
-  print values.to_json
+  if list_envs
+    print Apptokit.environments.to_json
+  elsif show_envs.any?
+    output = show_envs.each_with_object({}) do |env, out|
+      out[env] = values(Apptokit::Configuration.new(env))
+    end
+    print output.to_json
+  else
+    print values(Apptokit.config).to_json
+  end
 end
 
