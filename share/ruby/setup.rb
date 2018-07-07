@@ -27,13 +27,16 @@ module Apptokit
       oauth_callback_bind
       oauth_callback_path
       oauth_callback_hostname
+
+      installation_keycache_expiry
+      user_keycache_expiry
     )
 
     DEFAULT_GITHUB_URL = URI("https://api.github.com")
 
     attr_accessor :app_id, :webhook_secret, :installation_id
     attr_accessor :client_id, :client_secret, :oauth_callback_port, :oauth_callback_bind, :oauth_callback_path, :oauth_callback_hostname
-    attr_writer :private_key_path_glob, :keycache_file_path, :env
+    attr_writer :private_key_path_glob, :keycache_file_path, :env, :user_keycache_expiry, :installation_keycache_expiry
 
     def self.environments
       envs = []
@@ -88,6 +91,18 @@ module Apptokit
 
     def env
       @env ||= ENV["APPTOKIT_ENV"] || ENV["GH_ENV"]
+    end
+
+    def user_keycache_expiry
+      @default_keycache_expiry ||= 5 * 24 * 60 * 60
+    end
+
+    def installation_keycache_expiry
+      @default_keycache_expiry ||= 9 * 60
+    end
+
+    def keycache_file_path
+      @keycache_file_path ||= HOME_DIR_CONF_PATH.dirname.join(".apptokit_#{env || "global"}_keycache")
     end
 
     private

@@ -3,6 +3,7 @@
 require 'net/http'
 require 'thread'
 
+require 'apptokit/key_cache'
 require 'apptokit/oauth_callback_server'
 
 module Apptokit
@@ -11,14 +12,16 @@ module Apptokit
       new(auto_open: auto_open, code: code).tap {|t| t.generate}
     end
 
-    attr_reader :auto_open, :installation_id, :mutex, :condition_variable
-    attr_accessor :token, :token_type
-    private :token=, :token_type=
+    attr_reader :auto_open, :installation_id, :mutex, :condition_variable, :skip_cache
+    attr_accessor :token, :token_type, :cached
+    private :token=, :token_type=, :cached=
 
-    def initialize(installation_id: nil, auto_open: true, code: nil)
+    def initialize(installation_id: nil, auto_open: true, code: nil, skip_cache: false)
       @installation_id = installation_id || Apptokit.config.installation_id
       @auto_open = auto_open.nil? ? true : auto_open
       @code = code
+      @cached = true
+      @skip_cache = skip_cache
       @mutex, @condition_variable = Mutex.new, ConditionVariable.new
     end
 
@@ -28,13 +31,21 @@ module Apptokit
     end
 
     def generate
-      validate_generateable!
+      if skip_cache
+        self.cached = false
+        return perform_generation
+      end
 
-      oauth_code = generate_oauth_code
+      token = Apptokit.keycache.get_set(cache_key, :user) do
+        self.cached = false
+        perform_generation.token
+      end
 
-      token_info = exchange_code_for_token(oauth_code)
-      self.token = token_info["access_token"]
-      self.token_type = token_info["token_type"]
+      if self.cached
+        self.token = token
+        self.token_type = "Bearer"
+      end
+
       self
     end
 
@@ -47,6 +58,21 @@ module Apptokit
     end
 
     private
+
+    def perform_generation
+      validate_generateable!
+
+      oauth_code = generate_oauth_code
+
+      token_info = exchange_code_for_token(oauth_code)
+      self.token = token_info["access_token"]
+      self.token_type = token_info["token_type"]
+      self
+    end
+
+    def cache_key
+      "user:#{installation_id}"
+    end
 
     def generate_oauth_code
       return @code if @code

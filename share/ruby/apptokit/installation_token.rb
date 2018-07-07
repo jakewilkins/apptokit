@@ -4,17 +4,21 @@ require 'apptokit/jwt'
 require 'net/http'
 require 'json'
 
+require "apptokit/key_cache"
+
 module Apptokit
   class InstallationToken
     def self.generate(installation_id: nil)
       new(installation_id: installation_id).tap {|t| t.generate}
     end
 
-    attr_reader :installation_id, :token, :expires_at
-    attr_writer :token, :expires_at
-    private :token=, :expires_at=
+    attr_reader :installation_id, :token, :expires_at, :skip_cache, :cached
+    attr_writer :token, :expires_at, :cached
+    private :token=, :expires_at=, :cached=
 
-    def initialize(installation_id: nil)
+    def initialize(installation_id: nil, skip_cache: false)
+      @skip_cache = skip_cache
+      @cached = true
       @installation_id = installation_id || Apptokit.config.installation_id
     end
 
@@ -24,6 +28,26 @@ module Apptokit
     end
 
     def generate
+      if skip_cache
+        self.cached = false
+        return perform_generation
+      end
+
+      token, expiry = Apptokit.keycache.get_set(cache_key, :installation, return_expiry: true) do
+        self.cached = false
+        perform_generation
+        [self.token, self.expires_at]
+      end
+
+      if cached
+        self.token = token
+        self.expires_at = expiry.iso8601
+      end
+
+      self
+    end
+
+    def perform_generation
       uri = URI(installation_token_url)
       request = Net::HTTP::Post.new(uri)
       request["Accept"] = "application/vnd.github.machine-man-preview+json"
@@ -42,6 +66,10 @@ module Apptokit
         raise ApptokitError.new("Could not create an Installation Token: #{response.code}\n\n#{response.body}")
       end
       self
+    end
+
+    def cache_key
+      "installation:#{installation_id}"
     end
 
     def jwt

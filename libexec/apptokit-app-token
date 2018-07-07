@@ -2,7 +2,7 @@
 # Usage: apptokit app-token
 # Summary: Generate a JWT for your GitHub App
 # Help:
-#   Pulls from the .apptokit.yml file.
+#   Pulls config from the .apptokit.yml file.
 
 require "setup"
 require "apptokit/jwt"
