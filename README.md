@@ -7,11 +7,13 @@ $ apptokit help
 Usage: apptokit <command> [<args>]
 
 Some useful apptokit commands are:
+   env                 Provide information about the currently configured GitHub App
    fingerprint         Fingerprint the currently selected GitHub App private key.
    app-token           Generate a JWT for your GitHub App
    user-token          Generate an User-Server token for a GitHub App installation.
    installation-token  Generate an installation token for a GitHub App installation.
    curl                Perform a curl command authenticated as a GitHub App.
+   keycache            Work with the keycache for this Apptokit ENV
    commands            List all apptokit commands
 
 See 'apptokit help <command>' for information on a specific command.
