@@ -51,8 +51,7 @@ $ apptokit curl app post installations/15/access_tokens
 
 Performing a User-Server request like [List repositories accessible to the user for an installation](https://developer.github.com/v3/apps/installations/#list-repositories-accessible-to-the-user-for-an-installation)
 
-NOTE: this will open your browser. There's a TODO here for caching User-Server tokens
-and then trying to regenerate if it fails.
+NOTE: this will open your browser unless there is an existing user token in the key cache.
 
 ```bash
 $ apptokit curl user user/installations/15/repositories | jq
