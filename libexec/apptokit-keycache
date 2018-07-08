@@ -1,0 +1,73 @@
+#!/bin/bash
+# Usage: apptokit keycache <show|drop> [key type]
+# Summary: Work with the keycache for this Apptokit ENV
+# provide apptokit completions
+# Help:
+#   Show or remove entries from the key cache. Useful if you find yourself in
+#   a bad state.
+#
+#   show        -  list entries in the cache
+#   drop <what> -  remove entries from the cache.
+#        <what> should be one of:
+#               all - delete the entire cache
+#              user - delete the user key for this env
+#      installation - delete the installation key for this env
+#
+
+if [[ "$1" == "--complete" ]]; then
+  echo "show"
+  echo "drop"
+  exit
+else
+  if [[ ! "$1" =~ ^(show|drop)$ ]]; then
+    echo "invalid keycache command '$1'"
+    apptokit help keycache
+    exit 1
+  fi
+  exec "$(which ruby)" "$0" "$@"
+fi
+
+#!ruby
+
+require "setup"
+require "apptokit/key_cache"
+
+def drop_keytype(type)
+  keycache = Apptokit.keycache
+  keys = keycache.keys.find_all {|k| k[type]}
+  keys.each {|k| keycache.drop(k)}
+  keys
+end
+
+env = Apptokit.config.env
+env_message = env ? " for env '#{env}'" : ""
+
+case ARGV.shift
+when "show"
+  keys = Apptokit.keycache.keys
+  if keys.any?
+    puts "Apptokit has cached the following keys#{env_message}:"
+    puts " - " + keys.join("\n - ")
+  else
+    puts "Apptokit cache is empty#{env_message}"
+  end
+when "drop"
+  key_type = ARGV.shift
+
+  unless %w(all user installation).include?(key_type)
+    puts "apptokit keycache drop requires a key type to remove"
+    puts `apptokit help keycache`
+    exit 1
+  end
+
+  if key_type == "all"
+    print "Clearing all keys#{env_message}..."
+    Apptokit.keycache.clear
+    puts " done."
+  else
+    print "Clearing key type '#{key_type}'#{env_message}..."
+    keys = drop_keytype(key_type)
+    puts " done."
+    puts "deleted keys:\n - " + keys.join("\n - ")
+  end
+end

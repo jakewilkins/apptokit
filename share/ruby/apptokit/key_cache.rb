@@ -10,6 +10,10 @@ module Apptokit
       @db = DBM.open(db_file_path, 0600, DBM::WRCREAT)
     end
 
+    def keys
+      db.keys
+    end
+
     def get(key, ignore_expiry: false, return_expiry: false)
       value = db[key]
       return value unless value
