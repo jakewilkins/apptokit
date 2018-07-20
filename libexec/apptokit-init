@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
-# Usage: apptokit init <path> [--env=env]
+# Usage: apptokit init <path|--global> [--env=env]
 # Summary: Generate a .apptokit.yml or add a new App environment
 # Help: This command will provide you with a starting point to use Apptokit,
 # Or, if you're already up and running will provide you with a template for adding
@@ -8,19 +8,34 @@
 #
 # Examples:
 #
-#    apptokit init .            # Generates a basic apptokit.yml config
-#    apptokit init . --env test # Will add a "test" environment to your existing
-#                                 config or generate a config with a test environment
+#    apptokit init .                   # Generates a basic apptokit.yml config
+#    apptokit init . --env test        # Will add a "test" environment to your existing
+#                                        config or generate a config with a test environment
+#    apptokit init --global            # Generate a new apptokit.yml config in ~/.config/
+#    apptokit init --global --env test # Add a "test" environment config in ~/.config/
 require "setup"
 require "pathname"
 require "yaml"
 require "fileutils"
 require "erb"
 
-dir = ARGV.shift
+def show_help(msg = nil)
+  puts msg if msg
+  puts `apptokit help init`
+  exit 1
+end
 
-if dir == "."
-  dir = Dir.pwd
+show_help("For init you must specify either a path or --global") if ARGV.empty?
+
+filename = ".apptokit.yml"
+dir = if (%w(--global -g) & ARGV).any?
+  filename = "apptokit.yml"
+  Pathname.new(ENV["HOME"]).join(".config")
+elsif ARGV[0] == "."
+  ARGV.shift
+  Dir.pwd
+else
+  ARGV.shift
 end
 
 if %w(--env -e).include?(dir)
@@ -33,7 +48,10 @@ else
 end
 
 dir = Pathname.new(dir)
-yaml_path = dir.join(".apptokit.yml")
+
+show_help("Must specify an existing path -- '#{dir}' does not exist") unless dir.exist?
+
+yaml_path = dir.join(filename)
 backup_yaml_path = "#{yaml_path}.bac"
 
 existing = yaml_path.exist?
@@ -42,9 +60,7 @@ if existing && !env
   print "Overwrite existing config at '#{yaml_path}'? (Y/n) "
   ans = gets.chomp
   if ans.upcase != "Y"
-    puts "Not overwriting..."
-    puts `apptokit help init`
-    exit 1
+    show_help("Not overwriting...")
   else
     puts "Archiving original to .bac because we ❤️  you..."
     FileUtils.mv(yaml_path, backup_yaml_path, verbose: true)
@@ -60,11 +76,11 @@ end
 
 full_template = Apptokit::Configuration::SHARE_DIR.join("apptokit-full-template.yml")
 
-if !existing
+if existing && env
+  puts "Updating .apptokit.yml..."
+else
   puts "Creating .apptokit.yml..."
   FileUtils.cp(full_template, yaml_path)
-else
-  puts "Updating .apptokit.yml..."
 end
 
 if env
