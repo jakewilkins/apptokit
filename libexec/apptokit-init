@@ -19,10 +19,18 @@ require "yaml"
 require "fileutils"
 require "erb"
 
+full_template = Apptokit::Configuration::SHARE_DIR.join("apptokit-full-template.yml")
+
 def show_help(msg = nil)
   puts msg if msg
   puts `apptokit help init`
   exit 1
+end
+
+if ARGV[0] == "initial-setup"
+  yaml_path = Pathname.new(ENV['HOME']).join(".config/apptokit.yml")
+  FileUtils.cp(full_template, yaml_path, verbose: true) unless yaml_path.exist?
+  exit
 end
 
 show_help("For init you must specify either a path or --global") if ARGV.empty?
@@ -73,8 +81,6 @@ if existing && !env
     end
   end
 end
-
-full_template = Apptokit::Configuration::SHARE_DIR.join("apptokit-full-template.yml")
 
 if existing && env
   puts "Updating .apptokit.yml..."
