@@ -8,8 +8,8 @@ require 'apptokit/oauth_callback_server'
 
 module Apptokit
   class UserToken
-    def self.generate(auto_open: true, code: nil)
-      new(auto_open: auto_open, code: code).tap {|t| t.generate}
+    def self.generate(auto_open: true, code: nil, skip_cache: false)
+      new(auto_open: auto_open, code: code, skip_cache: skip_cache).tap {|t| t.generate}
     end
 
     attr_reader :auto_open, :installation_id, :mutex, :condition_variable, :skip_cache

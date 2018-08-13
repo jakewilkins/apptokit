@@ -8,8 +8,8 @@ require "apptokit/key_cache"
 
 module Apptokit
   class InstallationToken
-    def self.generate(installation_id: nil)
-      new(installation_id: installation_id).tap {|t| t.generate}
+    def self.generate(installation_id: nil, skip_cache: false)
+      new(installation_id: installation_id, skip_cache: skip_cache).tap {|t| t.generate}
     end
 
     attr_reader :installation_id, :token, :expires_at, :skip_cache, :cached
@@ -50,6 +50,11 @@ module Apptokit
     def perform_generation
       uri = URI(installation_token_url)
       request = Net::HTTP::Post.new(uri)
+      if ENV["USER_AGENT"]
+        request["User-Agent"] = ENV["USER_AGENT"]
+      else
+        request["User-Agent"] = "Apptokit"
+      end
       request["Accept"] = "application/vnd.github.machine-man-preview+json"
       request["Authorization"] = jwt.header
 
@@ -62,6 +67,9 @@ module Apptokit
         hash = JSON.parse(response.body)
         self.token      = hash["token"]
         self.expires_at = hash["expires_at"]
+      when Net::HTTPNotFound then
+        puts "The installation token you provided is innaccessible, please verify it"
+        exit 1
       else
         raise ApptokitError.new("Could not create an Installation Token: #{response.code}\n\n#{response.body}")
       end

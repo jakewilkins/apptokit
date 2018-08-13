@@ -27,6 +27,7 @@ require "apptokit/user_token"
 
 auto_open = ARGV.find { |arg| arg == "--no-auto-open" }
 code = ARGV.find {|str| str =~ /[a-z0-9]{20}/}
+force = (%w(-f --force) - ARGV).any?
 
 DummyToken = Struct.new(:token) do
   def header
@@ -39,7 +40,7 @@ DummyToken = Struct.new(:token) do
 end
 
 token = ENV["APPTOKIT_USER_TOKEN"] && DummyToken.new(ENV["APPTOKIT_USER_TOKEN"])
-token ||= Apptokit::UserToken.generate(auto_open: !auto_open, code: code)
+token ||= Apptokit::UserToken.generate(auto_open: !auto_open, code: code, skip_cache: force)
 
 if $stdout.isatty
   puts "Your token:"

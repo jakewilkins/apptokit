@@ -1,11 +1,14 @@
 #!/usr/bin/env ruby
 # Usage: apptokit installation-token
 # Summary: Generate an installation token for a GitHub App installation.
+# Help: Generates an installation token for your app
 
 require "setup"
 require "apptokit/installation_token"
 
-token = Apptokit::InstallationToken.generate
+force = (%w(-f --force) - ARGV).any?
+
+token = Apptokit::InstallationToken.generate(skip_cache: force)
 
 if $stdout.isatty
   puts "Your token:"
