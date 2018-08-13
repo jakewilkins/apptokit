@@ -100,10 +100,12 @@ fi
 
 shift
 
-github_url=`ruby -rsetup -e "print Apptokit.config.github_url"`
-
 if [[ "$path" != *http* ]]; then
-  path="$github_url/$path"
+  github_url=`ruby -rsetup -e "print Apptokit.config.github_url"`
+  joiner=$([ ${path:0:1} == "/" ] && echo "" || echo "/")
+  path="$github_url$joiner$path"
 fi
 
-curl $request_method -H "Authorization: $auth" -H "Accept: $PREVIEW_HEADER" $@ $path
+user_agent=${USER_AGENT:-Apptokit}
+
+curl $request_method --user-agent "$user_agent" -H "Authorization: $auth" -H "Accept: $PREVIEW_HEADER" $@ $path
