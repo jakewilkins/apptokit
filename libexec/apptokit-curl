@@ -3,25 +3,25 @@
 # Summary: Perform a curl command authenticated as a GitHub App.
 # provide apptokit completions
 # Help:
-#  <authentication type> should be one of:"
-#     - app:           Perform a request using the GitHub App JWT to authenticate."
-#     - installation:  Perform a Server-Server request as a GitHub App installation."
-#     - user:          Perform a User-Server request. Note: this might require browser interaction."
+#  <authentication type> should be one of:
+#     - app:           Perform a request using the GitHub App JWT to authenticate.
+#     - installation:  Perform a Server-Server request as a GitHub App installation.
+#     - user:          Perform a User-Server request. Note: this might require browser interaction.
+#     - pat:           Not a GitHub App request, curl using a Personal Access Token. Userful for 
 #
-#  [request method] can be used to specify the HTTP request method, or you can always set it in Curl opts"
+#  [request method] can be used to specify the HTTP request method, or you can always set it in Curl opts
 #
 #  Any options passed after the path of your request will be forwarded on to the Curl command.
 
 set -e
 
 request_methods=("get" "post" "put" "patch" "delete" "GET" "POST" "PUT" "PATCH" "DELETE")
-request_types=("app" "installation" "user")
+request_types=("app" "installation" "user" "pat")
 
 if [[ "$1" == "--complete" ]]; then
 
   request_type="$(echo -e "${2}" | tr -d '[:space:]')" 
   if [[ ! " ${request_types[@]} " =~ " ${request_type} " ]]; then
-    echo "her: '${2}'" >> .completion_args
     for i in "${request_types[@]}"; do
        echo "$i"
     done
