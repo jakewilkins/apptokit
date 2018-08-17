@@ -78,6 +78,9 @@ case "$request_type" in
   "app")
     auth="$(apptokit app-token)"
     ;;
+  "pat")
+    auth="Bearer $(ruby -rsetup -e "print Apptokit.config.personal_access_token")"
+    ;;
   *)
     echo "You have to specify an authentication type for apptokit curl:"
     apptokit help curl
