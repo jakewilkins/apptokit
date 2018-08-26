@@ -27,7 +27,7 @@ require "apptokit/user_token"
 
 auto_open = ARGV.find { |arg| arg == "--no-auto-open" }
 code = ARGV.find {|str| str =~ /[a-z0-9]{20}/}
-force = (%w(-f --force) - ARGV).any?
+force = (%w(-f --force) & ARGV).any?
 
 DummyToken = Struct.new(:token) do
   def header
