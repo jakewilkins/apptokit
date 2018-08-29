@@ -2,7 +2,6 @@
 set -e
 
 COMMAND="$1"
-echo "her '$COMMAND' her" >> .completion_args
 if [ -z "$COMMAND" ]; then
   echo "usage: apptokit completions COMMAND [arg1 arg2...]" >&2
   exit 1
