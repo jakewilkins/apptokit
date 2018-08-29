@@ -30,7 +30,9 @@ module Apptokit
     def generate
       if skip_cache
         self.cached = false
-        return perform_generation
+        perform_generation
+        Apptokit.keycache.set(cache_key, token, expires_at)
+        return self
       end
 
       token, expiry = Apptokit.keycache.get_set(cache_key, :installation, return_expiry: true) do
@@ -85,7 +87,7 @@ module Apptokit
     end
 
     def installation_token_url
-      URI("#{Apptokit.config.github_url}/installations/#{installation_id}/access_tokens")
+      URI("#{Apptokit.config.github_url}/app/installations/#{installation_id}/access_tokens")
     end
   end
 end

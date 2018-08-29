@@ -33,7 +33,9 @@ module Apptokit
     def generate
       if skip_cache
         self.cached = false
-        return perform_generation
+        perform_generation
+        Apptokit.keycache.set(cache_key, token, :user)
+        return self
       end
 
       token = Apptokit.keycache.get_set(cache_key, :user) do

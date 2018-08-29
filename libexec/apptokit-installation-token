@@ -6,7 +6,7 @@
 require "setup"
 require "apptokit/installation_token"
 
-force = (%w(-f --force) - ARGV).any?
+force = (%w(-f --force) & ARGV).any?
 
 token = Apptokit::InstallationToken.generate(skip_cache: force)
 
