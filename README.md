@@ -19,22 +19,55 @@ Some useful apptokit commands are:
 See 'apptokit help <command>' for information on a specific command.
 ```
 
-### Installation
+### Getting Started
 
-Currently don't have a great story for this. This is build off of [basecamp/sub](https://github.com/basecamp/sub),
-and it seems like the installation instructions are:
+`apptokit` ships with an installation script, [read it over][install-script-html] 
 
-1. Clone this repo
-2. Either put `bin` in your path or
-3. Add the output of `apptokit shell-setup` to your shell config.
+```bash
+bash -c "$(curl https://raw.githubusercontent.com/jakewilkins/apptokit/master/install.sh -fsSL)" -- install
+```
 
-I'm not super happy with that process, but I wanted something slightly less Ruby centric than
-a Ruby gem. While this does use Ruby, it's only non-standarb-library dependency is 
-vendored in `share/` and all Ruby code runs under the Ruby version that ships with MacOS.
+This will install `apptokit` into `/usr/local` and generate a comment-filled
+`~/.config/apptokit.yml`.
 
-Options set from .apptokit.yml, with a default loaded from ~/config/apptokit.yml,
-checkout apptokit.yml.example for options.
+Apptokit uses environments to work with multiple GitHub Apps, so you can have a
+development app for testing new permissions and also a client configured for
+debugging your production app.
 
+Setting up a new environment happens with:
+
+```bash
+apptokit init --global --env development
+```
+
+This will add new keys to `~/.config/apptokit.yml` for a development environment where
+you can specify:
+
+* `private_key_path_glob`: A path pattern to use to look for the `.pem` file to use.
+* `app_id`: The GitHub App ID. Found on the settings page.
+* `installation_id`: An installation ID to use for generation installation tokens.
+* `client_id`: The Client ID for the GitHub App. Found on the settings page.
+* `client_secret`: The OAuth client secret for the GitHub App. Found on the settings page.
+
+To use `apptokit` for User-to-Server, you have to configure the User authorization
+callback URL to
+
+```
+http://localhost:8075/callback
+```
+
+To configure this view the help docs for `user-token` by `apptokit help user-token`.
+
+
+Those docs also explain how to split the process into separate commands if you're
+unable to change the authorize callback URL for the GitHub App you're configuring.
+
+### Changing environments
+
+`apptokit` uses the ENV variables `APPTOKIT_ENV` & `GH_ENV` to pick the environment.
+
+If you setup project specific YAML files you can specify a default env via a
+`default_env` key.
 
 ### Examples
 
@@ -49,7 +82,7 @@ $ apptokit curl app post installations/15/access_tokens
 
 ```
 
-Performing a User-Server request like [List repositories accessible to the user for an installation](https://developer.github.com/v3/apps/installations/#list-repositories-accessible-to-the-user-for-an-installation)
+Performing a User-Server request like [List repositories accessible to the user for an installation][list-repos]
 
 NOTE: this will open your browser unless there is an existing user token in the key cache.
 
@@ -68,7 +101,7 @@ $ apptokit curl user user/installations/15/repositories | jq
 }
 ```
 
-Or [creating an Issue Comment](https://developer.github.com/v3/issues/comments/#create-a-comment) as an app and a user, just switching one flag:
+Or [creating an Issue Comment][create-issue-docs] as an app and a user, just switching one flag:
 
 ```bash
 $ cat issue_comment.json
@@ -125,3 +158,8 @@ $ apptokit curl user post repos/jakewilkins/fictional-octo-funicular/issues/16/c
 }
 
 ```
+
+
+[install-script-html]: https://github.com/jakewilkins/apptokit/blob/master/install.sh
+[create-issue-docs]: https://developer.github.com/v3/issues/comments/#create-a-comment
+[list-repos]: https://developer.github.com/v3/apps/installations/#list-repositories-accessible-to-the-user-for-an-installation

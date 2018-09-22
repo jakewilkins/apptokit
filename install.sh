@@ -107,4 +107,4 @@ case "$1" in
   ;;
 esac
 
-#// vim: set ft=bash:
+#// vim: set ft=sh:
