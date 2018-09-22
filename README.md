@@ -21,7 +21,7 @@ See 'apptokit help <command>' for information on a specific command.
 
 ### Getting Started
 
-`apptokit` ships with an installation script, [read it over][install-script-html] 
+`apptokit` ships with an installation script, [read it over][install-script-html].
 
 ```bash
 bash -c "$(curl https://raw.githubusercontent.com/jakewilkins/apptokit/master/install.sh -fsSL)" -- install
