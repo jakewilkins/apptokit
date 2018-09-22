@@ -67,7 +67,7 @@ function install {
   echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
   echo "Installer complete!"
   echo
-  echo 'If /usr/bin is not in your $PATH or you\'d like tab completions, follow instructions below.
+  echo "If /usr/bin is not in your \$PATH or you'd like tab completions, follow instructions below."
   echo
 
 
