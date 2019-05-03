@@ -96,6 +96,14 @@ function uninstall {
 
 case "$1" in
   "install" )
+    if [[ "$2" != "--i-have-read-this-script" ]]; then
+      (>&2 echo "🚨🚨 Howdy! This install script is very much a WIP 🚨🚨")
+      (>&2 echo "I very much appreciate you trying it it. Have you read it over?")
+      (>&2 echo "If not I heartily recommend giving it a glance: https://git.io/fjLww")
+      (>&2 echo "Inside you will find the 🗝  to ~happiness~ and avoiding this message.")
+      exit
+    fi
+
     install
   ;;
   "uninstall" )
