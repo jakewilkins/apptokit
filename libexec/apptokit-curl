@@ -64,7 +64,7 @@ if [[ "$1" == "--help" || "$1" == "-h" ]]; then
   echo
 fi
 
-PREVIEW_HEADER="application/vnd.github.machine-man-preview+json, application/vnd.github.v3.text-match+json"
+PREVIEW_HEADER=${PREVIEW_HEADER:-"application/vnd.github.machine-man-preview+json, application/vnd.github.v3.text-match+json"}
 
 request_type=$1
 
