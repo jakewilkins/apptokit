@@ -94,14 +94,13 @@ if [[ " ${request_methods[@]} " =~ " ${1} " ]]; then
 fi
 
 path=$1
+shift
 
 if [ -z "$path" ]; then
-  echo "You have to specify a path for apptokit curl:"
+  (>&2 echo "You have to specify a path for apptokit curl:")
   apptokit help curl
   exit 13
 fi
-
-shift
 
 if [[ "$path" != *http* ]]; then
   github_url=`ruby -rsetup -e "print Apptokit.config.github_url"`
