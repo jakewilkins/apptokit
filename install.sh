@@ -54,7 +54,7 @@ function install {
 
   popd
 
-  rm -r "$CLONE_DIR" 1>/dev/null
+  [ -d "$CLONE_DIR" ] && rm -rf "$CLONE_DIR" 1>/dev/null
 
   ln -vs $LIB_DIR/libexec/$APP $BIN_DIR/$APP
   # FIXME - this link is kind of gross - but I'm leaving it so that
