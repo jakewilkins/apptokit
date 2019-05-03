@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'dbm'
+require 'date'
 
 module Apptokit
   class KeyCache
