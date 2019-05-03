@@ -11,6 +11,11 @@
 #   - private key path
 #   - webhook_secret
 #   - client_id
+#
+# Flags:
+#
+# --[e]dit  edit your apptokit config
+# --[l]ist  list your configured apptokit environments.
 
 require "setup"
 
