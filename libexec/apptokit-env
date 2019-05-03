@@ -40,11 +40,14 @@ def display(values)
   end
 end
 
+edit_envs = (%w(--edit -e) & ARGV).any?
 list_envs = (%w(--list -l list) & ARGV).any?
 show_envs = ARGV & Apptokit::Configuration.environments
 
 if $stdout.isatty
-  if list_envs
+  if edit_envs
+    Kernel.exec(ENV["EDITOR"], Apptokit::Configuration::HOME_DIR_CONF_PATH.to_s)
+  elsif list_envs
     puts "Apptokit knows about these environments:"
     Apptokit::Configuration.environments.each do |env|
       puts " - #{env}"
