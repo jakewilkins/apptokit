@@ -20,9 +20,9 @@ if [[ "$1" == "--complete" ]]; then
   exit
 else
   if [[ ! "$1" =~ ^(show|drop)$ ]]; then
-    echo "invalid keycache command '$1'"
+    (>&2 echo "invalid keycache command '$1'")
     apptokit help keycache
-    exit 1
+    exit 15
   fi
   exec "$(which ruby)" "$0" "$@"
 fi
@@ -55,9 +55,9 @@ when "drop"
   key_type = ARGV.shift
 
   unless %w(all user installation).include?(key_type)
-    puts "apptokit keycache drop requires a key type to remove"
-    puts `apptokit help keycache`
-    exit 1
+    $stderr.puts "apptokit keycache drop requires a key type to remove"
+    $stderr.puts `apptokit help keycache`
+    exit 16
   end
 
   if key_type == "all"
@@ -71,3 +71,6 @@ when "drop"
     puts "deleted keys:\n - " + keys.join("\n - ")
   end
 end
+
+#// vim: set ft=ruby
+
