@@ -50,7 +50,9 @@ if $stdout.isatty
   elsif list_envs
     puts "Apptokit knows about these environments:"
     Apptokit::Configuration.environments.each do |env|
-      puts " - #{env}"
+      env = Apptokit::Configuration.new(env)
+      url = env.github_url == Apptokit::Configuration::DEFAULT_GITHUB_URL ? "" : " (#{env.github_url})"
+      puts " - #{env.env}#{url}"
     end
   elsif show_envs.any?
     show_envs.each do |env|
