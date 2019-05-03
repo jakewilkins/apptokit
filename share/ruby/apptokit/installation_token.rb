@@ -70,8 +70,8 @@ module Apptokit
         self.token      = hash["token"]
         self.expires_at = hash["expires_at"]
       when Net::HTTPNotFound then
-        puts "The installation token you provided is innaccessible, please verify it"
-        exit 1
+        $stderr.puts "The installation token you provided is innaccessible, please verify it"
+        exit 15
       else
         raise ApptokitError.new("Could not create an Installation Token: #{response.code}\n\n#{response.body}")
       end
