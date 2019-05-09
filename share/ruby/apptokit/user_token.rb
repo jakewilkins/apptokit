@@ -4,7 +4,7 @@ require 'net/http'
 require 'thread'
 
 require 'apptokit/key_cache'
-require 'apptokit/oauth_callback_server'
+require 'apptokit/callback_server'
 
 module Apptokit
   class UserToken
@@ -79,7 +79,7 @@ module Apptokit
     def generate_oauth_code
       return @code if @code
 
-      callback_server = OauthCallbackServer.new(mutex, condition_variable)
+      callback_server = CallbackServer.new(mutex, condition_variable)
       callback_server.start
 
       if auto_open

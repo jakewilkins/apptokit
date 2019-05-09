@@ -3,7 +3,7 @@
 require 'webrick'
 
 module Apptokit
-  class OauthCallbackServer
+  class CallbackServer
     RESPONSE_BODY = <<-HTML
     <html>
       <body>
@@ -16,12 +16,14 @@ module Apptokit
     attr_writer :request
     private :mutex, :condition_variable, :thread, :request, :request=
 
-    def initialize(mutex, condition_variable)
+    def initialize(mutex, condition_variable, &block)
       @mutex, @condition_variable = mutex, condition_variable
       @port = Apptokit.config.oauth_callback_port.nil? ? 8075 : Apptokit.config.oauth_callback_port
       @bind = Apptokit.config.oauth_callback_bind || 'localhost'
       @path = Apptokit.config.oauth_callback_path || '/callback'
       @hostname = Apptokit.config.oauth_callback_hostname || 'localhost'
+
+      block.call(self) unless block.nil?
     end
 
     def callback_url
@@ -32,6 +34,7 @@ module Apptokit
     def oauth_code
       @oauth_code ||= Hash[URI.decode_www_form(request.query_string)]["code"]
     end
+    alias callback_code oauth_code
 
     def start
       log_file = File.open('/dev/null', 'a+')
