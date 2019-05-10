@@ -58,6 +58,10 @@ module Apptokit
       envs - %w(default_env)
     end
 
+    def self.loading_manifest(v = nil)
+      v ? (@loading_manifest = v) : @loading_manifest
+    end
+
     def initialize(env = nil)
       @env = env
       reload!
@@ -160,6 +164,7 @@ module Apptokit
     end
 
     def set_opts_from_manifest
+      return if self.class.loading_manifest
       return unless env_from_manifest?
 
       settings = ManifestApp::Settings.new(env, {
@@ -168,7 +173,9 @@ module Apptokit
       })
 
       return unless settings.loaded? || realize_manifest?
+      self.class.loading_manifest(true)
       settings.fetch
+      self.class.loading_manifest(false)
 
       settings.apply(self)
     end
