@@ -32,6 +32,7 @@ module Apptokit
     end
 
     def oauth_code
+      return nil if request.nil?
       @oauth_code ||= Hash[URI.decode_www_form(request.query_string)]["code"]
     end
     alias code oauth_code
