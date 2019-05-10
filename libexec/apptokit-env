@@ -1,4 +1,4 @@
-#!/usr/bin/env ruby
+#!/usr/bin/env ruby -w0
 # Usage: apptokit env
 # Summary: Provide information about the currently configured GitHub App
 # Help:
@@ -6,6 +6,7 @@
 #
 #   - apptokit env
 #   - github_url
+#   - github_api_url
 #   - app_id
 #   - installation_id
 #   - private key path
@@ -36,6 +37,7 @@ def values(conf)
   values = {}
   values["APPTOKIT_ENV"] = conf.env
   values["GitHub URL"] = conf.github_url
+  values["GitHub API URL"] = conf.github_api_url
   values["App ID"] = conf.app_id
   values["Installation ID"] = conf.installation_id
   values["Private key path"] = conf.private_key_path
@@ -65,7 +67,10 @@ if $stdout.isatty
     puts "Apptokit knows about these environments:"
     Apptokit::Configuration.environments.each do |env|
       env = Apptokit::Configuration.new(env)
-      url = env.github_url == Apptokit::Configuration::DEFAULT_GITHUB_URL ? "" : " (#{env.github_url})"
+      url = env.github_url == Apptokit::Configuration::DEFAULT_GITHUB_URL ? nil : env.github_url
+      api_url = env.github_api_url == Apptokit::Configuration::DEFAULT_GITHUB_API_URL ? nil : env.github_api_url
+      urls = [url, api_url].compact
+      urls = urls.any? ? " (#{urls.join(", ")})" : ""
       puts " - #{env.env}#{url}"
     end
   elsif show_envs.any?

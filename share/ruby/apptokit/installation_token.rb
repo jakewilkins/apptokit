@@ -87,7 +87,7 @@ module Apptokit
     end
 
     def installation_token_url
-      URI("#{Apptokit.config.github_url}/app/installations/#{installation_id}/access_tokens")
+      URI("#{Apptokit.config.github_api_url}/app/installations/#{installation_id}/access_tokens")
     end
   end
 end

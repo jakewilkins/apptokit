@@ -101,7 +101,7 @@ module Apptokit
     end
 
     def exchange_code_for_token(code)
-      uri = URI("#{Apptokit.config.github_url.to_s.gsub("api.", "")}/login/oauth/access_token?")
+      uri = URI("#{Apptokit.config.github_url}/login/oauth/access_token?")
 
       res = Net::HTTP.post_form(uri, "client_id" => client_id,
                 "client_secret" => client_secret, "code" => code)
@@ -115,7 +115,7 @@ module Apptokit
     end
 
     def oauth_url(callback_url)
-      @oauth_url ||= "#{Apptokit.config.github_url.to_s.gsub("api.", "")}/login/oauth/authorize?client_id=#{client_id}&callback_url=#{callback_url}"
+      @oauth_url ||= "#{Apptokit.config.github_url}/login/oauth/authorize?client_id=#{client_id}&callback_url=#{callback_url}"
     end
 
     def validate_generateable!

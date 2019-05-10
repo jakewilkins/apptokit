@@ -110,4 +110,4 @@ fi
 
 user_agent=${USER_AGENT:-Apptokit}
 
-curl $request_method --user-agent "$user_agent" -H "Authorization: $auth" -H "Accept: $PREVIEW_HEADER" $@ $path
+curl $request_method --user-agent "$user_agent" -H "Authorization: $auth" -H "Accept: $PREVIEW_HEADER" "$@" $path
