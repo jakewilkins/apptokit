@@ -5,13 +5,15 @@ default_env: test
 
 test_defaults: &test_defaults
   # Useful for GitHub Enterprise installations
-  github_url: https://api.github.com
+  github_url: https://github.com
+  github_api_url: https://api.github.com
   # Future versions look forward to using this to look up your installation id.
   # installation_target: test-org
 
 # Same as test_defaults
 # prod_defaults: &prod_defaults
-  # github_url: https://api.github.com
+  # github_url: https://github.com
+  # github_api_url: https://api.github.com
   # installation_target: real-org
 
 test:
