@@ -10,6 +10,7 @@ module Apptokit
 
   class Configuration
     HOME_DIR_CONF_PATH = Pathname.new(ENV["HOME"]).join(".config/apptokit.yml")
+    HOME_DIR_CONF_DIR = Pathname.new(ENV["HOME"]).join(".config/apptokit")
     PROJECT_DIR_CONF_PATH = Pathname.new(Dir.pwd).join(".apptokit.yml")
     SHARE_DIR = Pathname.new(__FILE__).dirname.dirname
 
@@ -32,6 +33,9 @@ module Apptokit
       user_keycache_expiry
 
       personal_access_token
+
+      manifest_url
+      manifest
     )
 
     DEFAULT_GITHUB_URL = URI("https://api.github.com")
@@ -39,7 +43,8 @@ module Apptokit
     attr_accessor :app_id, :webhook_secret, :installation_id
     attr_accessor :client_id, :client_secret, :oauth_callback_port, :oauth_callback_bind, :oauth_callback_path, :oauth_callback_hostname
     attr_accessor :personal_access_token
-    attr_writer :private_key_path_glob, :keycache_file_path, :env, :user_keycache_expiry, :installation_keycache_expiry
+    attr_accessor :manifest_url, :manifest
+    attr_writer :private_key_path_glob, :keycache_file_path, :env, :user_keycache_expiry, :installation_keycache_expiry, :private_key
 
     def self.environments
       envs = []
@@ -60,6 +65,7 @@ module Apptokit
       set_opts_from_yaml(HOME_DIR_CONF_PATH)
       set_opts_from_yaml(PROJECT_DIR_CONF_PATH)
       set_opts_from_env
+      set_opts_from_manifest
     end
 
     def private_key
@@ -108,6 +114,10 @@ module Apptokit
       @keycache_file_path ||= HOME_DIR_CONF_PATH.dirname.join(".apptokit_#{env || "global"}_keycache")
     end
 
+    def env_from_manifest?
+      !manifest_url.nil? || !manifest.nil?
+    end
+
     private
 
     def set_opts_from_hash(hash)
@@ -137,6 +147,24 @@ module Apptokit
         out[opt] = ENV["APPTOKIT_#{opt.upcase}"]
       end)
     end
+
+    def set_opts_from_manifest
+      return unless env_from_manifest?
+
+      settings = ManifestApp::Settings.new(env, {
+        "manifest_url" => manifest_url,
+        "manifest"     => manifest
+      })
+
+      return unless settings.loaded? || realize_manifest?
+      settings.fetch
+
+      settings.apply(self)
+    end
+
+    def realize_manifest?
+      !ENV.has_key?("LIMITED_MANIFEST")
+    end
   end
 
   module_function
@@ -151,4 +179,6 @@ module Apptokit
     @config
   end
 end
+
+require 'apptokit/manifest_app/settings'
 
