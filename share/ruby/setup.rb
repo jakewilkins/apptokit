@@ -21,6 +21,7 @@ module Apptokit
       webhook_secret
       installation_id
       github_url
+      github_api_url
 
       client_id
       client_secret
@@ -38,7 +39,8 @@ module Apptokit
       manifest
     )
 
-    DEFAULT_GITHUB_URL = URI("https://api.github.com")
+    DEFAULT_GITHUB_URL     = URI("https://github.com")
+    DEFAULT_GITHUB_API_URL = URI("https://api.github.com")
 
     attr_accessor :app_id, :webhook_secret, :installation_id
     attr_accessor :client_id, :client_secret, :oauth_callback_port, :oauth_callback_bind, :oauth_callback_path, :oauth_callback_hostname
@@ -96,6 +98,15 @@ module Apptokit
 
     def github_url
       @github_url ||= DEFAULT_GITHUB_URL
+    end
+
+    def github_api_url=(arg)
+      arg = arg[0..-2] if arg[-1] == "/"
+      @github_api_url = URI(arg)
+    end
+
+    def github_api_url
+      @github_api_url ||= DEFAULT_GITHUB_API_URL
     end
 
     def env
