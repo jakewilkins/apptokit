@@ -34,7 +34,7 @@ module Apptokit
     def oauth_code
       @oauth_code ||= Hash[URI.decode_www_form(request.query_string)]["code"]
     end
-    alias callback_code oauth_code
+    alias code oauth_code
 
     def start
       log_file = File.open('/dev/null', 'a+')
