@@ -11,11 +11,18 @@
 #   - private key path
 #   - webhook_secret
 #   - client_id
+#   - manifest_url
+#   - manifest
 #
 # Flags:
 #
 # --[e]dit  edit your apptokit config
 # --[l]ist  list your configured apptokit environments.
+
+# If an Apptokit Env specifies a manifest we don't want listing
+# environments to trigger walking through the manifest creation
+# flow
+ENV["LIMITED_MANIFEST"] = 'yuh'
 
 require "setup"
 
@@ -34,6 +41,8 @@ def values(conf)
   values["Private key path"] = conf.private_key_path
   values["Webhook secret"] = conf.webhook_secret.inspect
   values["Client ID"] = conf.client_id
+  values["Manifest URL"] = conf.manifest_url
+  values["Manifest"] = conf.manifest
   values
 end
 
