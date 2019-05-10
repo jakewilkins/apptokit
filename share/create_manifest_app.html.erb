@@ -1,0 +1,15 @@
+<html>
+  <body>
+    <form action="https://github.com/settings/apps/new" method="post">
+      Create a GitHub App Manifest:
+      <input type="textarea" name="manifest" id="manifest" value="<%= manifest_json %>">
+      <br>
+      <input type="submit" value="Create">
+    </form>
+
+		<script>
+		 input = document.getElementById("manifest");
+		 input.value = JSON.stringify(<%= manifest_json %>);
+		</script>
+  </body>
+</html>
