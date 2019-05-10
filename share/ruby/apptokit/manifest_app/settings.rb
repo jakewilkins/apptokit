@@ -27,7 +27,8 @@ module Apptokit
       load_from_cache unless cli_opts[:skip_cache]
       return self if loaded?
 
-      app = ManifestApp.new(gh_env, yaml_conf, *cli_opts)
+      opts = {env_name: gh_env, yaml_conf: yaml_conf}.merge(cli_opts)
+      app = ManifestApp.new(opts)
       settings = app.create_app
       persist_to_cache(settings)
       load_from_cache
@@ -41,6 +42,10 @@ module Apptokit
       conf.private_key    = OpenSSL::PKey::RSA.new(app_settings["pem"])
       conf.client_secret  = app_settings["client_secret"]
       conf.webhook_secret = app_settings["webhook_secret"]
+
+      unless conf.installation_id
+        conf.installation_id = app_settings["installation_id"]
+      end
 
       conf
     end
