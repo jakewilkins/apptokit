@@ -58,8 +58,14 @@ module Apptokit
       envs - %w(default_env)
     end
 
-    def self.loading_manifest(v = nil)
-      v ? (@loading_manifest = v) : @loading_manifest
+    def self.loading_manifest(&block)
+      if block
+        @loading_manifest = true
+        block.call
+        @loading_manifest = false
+      else
+        @loading_manifest
+      end
     end
 
     def initialize(env = nil)
@@ -173,10 +179,16 @@ module Apptokit
       })
 
       return unless settings.loaded? || realize_manifest?
-      self.class.loading_manifest(true)
-      settings.fetch
-      self.class.loading_manifest(false)
+      self.class.loading_manifest do
+        settings.fetch
+        settings.apply(Apptokit.config)
+        settings.apply(self)
+      end
 
+      if installation_id.nil?
+        settings.install_app
+      end
+      settings.apply(Apptokit.config)
       settings.apply(self)
     end
 
