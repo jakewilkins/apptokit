@@ -6,6 +6,7 @@ require 'thread'
 require 'erb'
 require 'tempfile'
 
+require 'apptokit/jwt'
 require 'apptokit/callback_server'
 
 module Apptokit
@@ -26,24 +27,12 @@ module Apptokit
       @cached = true
       @skip_cache = skip_cache
       @mutex, @condition_variable = Mutex.new, ConditionVariable.new
+      @github_settings_response = nil
     end
 
     def create_app
       walk_user_through_creation_flow unless code
-      exchange_code_for_app_settings
-    end
-
-    def manifest_json
-      JSON.pretty_generate({
-        name: yaml_manifest["name"] || generated_name,
-        url: yaml_manifest["url"] || "http://example.com",
-        hook_attributes: yaml_manifest["hook_attributes"],
-        redirect_url: callback_server_url,
-        description: yaml_manifest["description"],
-        public: yaml_manifest["public"],
-        default_events: yaml_manifest["events"],
-        default_permissions: yaml_manifest["permissions"]
-      })
+      @github_settings_response = exchange_code_for_app_settings
     end
 
     def walk_user_through_creation_flow
@@ -81,7 +70,7 @@ module Apptokit
     end
 
     def exchange_code_for_app_settings
-      uri = URI("#{Apptokit.config.github_url}/app-manifests/#{code}/conversions")
+      uri = URI("#{Apptokit.config.github_api_url}/app-manifests/#{code}/conversions")
       res = Net::HTTP.post(uri, "", {"Accept" => "application/vnd.github.fury-preview+json"})
 
       case res
@@ -92,8 +81,50 @@ module Apptokit
       end
     end
 
+    def install_app
+      return unless @github_settings_response
+      return if skip_app_installation?
+
+      install_url = "#{@github_settings_response["html_url"]}/installations/new"
+      `$BROWSER #{install_url}`
+
+      sleep 2
+
+      installation, token = nil
+      count = 0
+      begin
+        count += 1
+        installations, token = get_installations(token)
+
+        installation = installations.first
+        sleep 2 unless installation
+      end while !installation && count < 10
+
+      if installation
+        return installation["id"]
+      else
+        $stderr.puts "Unable to retrieve an installation id for #{yaml_manifest["name"] || generated_name}."
+        $stderr.puts "Please specify on manually in your apptokit.yml."
+      end
+
+      nil
+    end
+
+    def manifest_json
+      JSON.pretty_generate({
+        name: yaml_manifest["name"] || generated_name,
+        url: yaml_manifest["url"] || "http://example.com",
+        hook_attributes: yaml_manifest["hook_attributes"] || {url: "http://example.com/webhooks"},
+        redirect_url: callback_server_url,
+        description: yaml_manifest["description"] || "An Apptokit Managed GitHub App",
+        public: yaml_manifest["public"] || false,
+        default_events: yaml_manifest["events"],
+        default_permissions: yaml_manifest["permissions"]
+      })
+    end
+
     def generated_name
-      "#{gh_env} Manifested App"
+      "#{env_name} Manifested App"
     end
 
     def callback_server_url
@@ -117,6 +148,34 @@ module Apptokit
         $stderr.puts "Could not fetch an App Manifest from #{yaml_conf["manifest_url"]}"
         exit 20
       end
+    end
+
+    def get_installations(token = nil)
+      token ||= Apptokit::JWT.new.header
+      uri = URI("#{Apptokit.config.github_api_url}/app/installations")
+      puts "fetching installations #{uri}"
+      response = Net::HTTP.start(uri.host, uri.port, use_ssl: uri.scheme == "https") do |http|
+        req = Net::HTTP::Get.new(uri)
+        req["Accept"] = "application/vnd.github.machine-man-preview+json"
+        req["Authorization"] = token
+
+        http.request(req)
+      end
+
+      case response
+      when Net::HTTPSuccess
+        parsed = JSON.parse(response.body)
+
+        [parsed, token]
+      else
+        sleep 0.1
+
+        [[], token]
+      end
+    end
+
+    def skip_app_installation?
+      ENV.has_key?("SKIP_INSTALLATION")
     end
   end
 end
