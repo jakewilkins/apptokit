@@ -18,6 +18,7 @@ module Apptokit
       @gh_env, @yaml_conf, @cli_opts = gh_env, yaml_conf, cli_opts
       @app_settings = nil
       @loaded = false
+      @manifest_app = nil
       load_from_cache
     end
 
@@ -28,8 +29,8 @@ module Apptokit
       return self if loaded?
 
       opts = {env_name: gh_env, yaml_conf: yaml_conf}.merge(cli_opts)
-      app = ManifestApp.new(opts)
-      settings = app.create_app
+      @manifest_app = ManifestApp.new(opts)
+      settings = @manifest_app.create_app
       persist_to_cache(settings)
       load_from_cache
 
@@ -48,6 +49,12 @@ module Apptokit
       end
 
       conf
+    end
+
+    def install_app
+      return unless @manifest_app
+      app_settings["installation_id"] = @manifest_app.install_app
+      persist_to_cache(app_settings)
     end
 
     def load_from_cache
