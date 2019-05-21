@@ -1,6 +1,6 @@
 <html>
   <body>
-    <form action="https://github.com/settings/apps/new" method="post">
+    <form action="<%= Apptokit.config.github_url %>/settings/apps/new" method="post">
       Create a GitHub App Manifest:
       <input type="textarea" name="manifest" id="manifest" value="<%= manifest_json %>">
       <br>
