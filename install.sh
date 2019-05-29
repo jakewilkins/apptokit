@@ -37,7 +37,7 @@ function install {
   PROJECT_GIT_URL="https://github.com/jakewilkins/apptokit.git"
   TAG="master"
   LIB_MOVES=("completions" "libexec" "share" "LICENSE")
-  CLONE_DIR=$(mktemp -d)
+  CLONE_DIR="./.apptokit-temp_clone"
 
   git clone $PROJECT_GIT_URL $CLONE_DIR
 
