@@ -132,7 +132,7 @@ module Apptokit
     end
 
     def keycache_file_path
-      @keycache_file_path ||= HOME_DIR_CONF_PATH.dirname.join(".apptokit_#{env || "global"}_keycache")
+      @keycache_file_path ||= HOME_DIR_CONF_DIR.join(".apptokit_#{env || "global"}_keycache")
     end
 
     def env_from_manifest?
