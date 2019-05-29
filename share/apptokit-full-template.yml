@@ -50,3 +50,29 @@ test:
   # client_id: Iv1.thisisnotanid
   # client_secret: 25fthisisnotahexclientsecret
 
+
+#
+# App Manifest configurations
+#
+
+# the name of the environment can be anything, same as above.
+#
+# The following wil be provided automatically via the App Manifest
+# creation flow
+# 
+# - app_id
+# - installation_id
+# - client_id
+# - client_secret
+# - private_key
+manifest-app-env:
+  # Any of the usual ENV keys are valid here
+  <<: *test_defaults
+  manifest:
+    name: Manifest App Name
+    permissions:
+      metadata: read
+      issues: write
+    events:
+      - issues
+
