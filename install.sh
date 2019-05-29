@@ -39,7 +39,7 @@ function install {
   LIB_MOVES=("completions" "libexec" "share" "LICENSE")
   CLONE_DIR="./.apptokit-temp_clone"
 
-  git clone $PROJECT_GIT_URL $CLONE_DIR
+  git clone --depth=1 $PROJECT_GIT_URL $CLONE_DIR
 
   mkdir -pv $LIB_DIR
   mkdir -pv $BIN_DIR
