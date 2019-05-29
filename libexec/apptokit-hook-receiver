@@ -1,0 +1,87 @@
+#!/usr/bin/env ruby
+
+
+require "setup"
+require "socket"
+require "pry"
+require 'pp'
+require "digest"
+
+port = (ENV["PORT"] || 8077).to_i
+
+server = TCPServer.new(port)
+server.setsockopt(Socket::IPPROTO_TCP, Socket::TCP_NODELAY, 1)
+
+def read_chunk(connection)
+  chunk = []
+  loop do
+    begin
+      line = connection.gets
+      break if line == "\r\n"
+      chunk << line
+    rescue EOFError
+      break
+    end
+  end
+  chunk
+end
+
+def receive_payload(connection)
+  payload = ""
+  loop do
+    begin
+      payload += connection.read_nonblock(1024 * 16)
+    rescue Errno::EAGAIN, EOFError
+      break
+    end
+  end
+  payload
+end
+
+def validate_hook_signature?(headers, payload)
+  secret = Apptokit.config.webhook_secret
+  header_signature = headers.find { |h| h.include?("X-Hub-Signature") }.split(": ").last
+  signature = 'sha1=' + OpenSSL::HMAC.hexdigest(OpenSSL::Digest.new('sha1'), secret, payload_body)
+  header_signature == signature
+end
+
+puts "*" * 76
+puts "*  hook-receiver, more than some other things in Apptokit, is alpha stage  *"
+puts "*  code. There are rough edges and it might not last.                      *"
+puts "*" + (" "*74) + "*"
+puts "*  If you like it let me know! If you find bugs let me know!               *"
+puts "*" * 76
+
+puts "listening for webhooks on port #{port}"
+
+begin
+  Socket.accept_loop(server) do |connection|
+    headers = read_chunk(connection)
+
+    if headers.first == "POST / HTTP/1.1\r\n"
+      payload = receive_payload(connection)
+
+      if Apptokit.config.webhook_secret
+        valid_signature = validate_hook_signature(headers, payload)
+      end
+
+      hash = JSON.parse(payload) rescue "Not valid JSON"
+
+      puts "Received hook:"
+      puts headers.join
+      puts "  -- Webhook signature validated --" if valid_signature
+      puts
+      puts "received payload:\n"
+      pp hash
+    else
+      puts headers.join("")
+      puts "this doesn't look like a webhook, skipping"
+    end
+
+    connection.write "HTTP/1.1 204 No Content\r\n"
+    connection.close
+  end
+rescue Interrupt
+  puts "bye!"
+  exit 0
+end
