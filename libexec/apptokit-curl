@@ -103,7 +103,7 @@ if [ -z "$path" ]; then
 fi
 
 if [[ "$path" != *http* ]]; then
-  github_url=`ruby -rsetup -e "print Apptokit.config.github_url"`
+  github_url=`ruby -rsetup -e "print Apptokit.config.github_api_url"`
   joiner=$([ ${path:0:1} == "/" ] && echo "" || echo "/")
   path="$github_url$joiner$path"
 fi
