@@ -8,20 +8,21 @@ require 'apptokit/callback_server'
 
 module Apptokit
   class UserToken
-    def self.generate(auto_open: true, code: nil, skip_cache: false)
-      new(auto_open: auto_open, code: code, skip_cache: skip_cache).tap {|t| t.generate}
+    def self.generate(auto_open: true, code: nil, skip_cache: false, user: nil)
+      new(auto_open: auto_open, code: code, skip_cache: skip_cache, user: user).tap {|t| t.generate}
     end
 
-    attr_reader :auto_open, :installation_id, :mutex, :condition_variable, :skip_cache
+    attr_reader :auto_open, :installation_id, :mutex, :condition_variable, :skip_cache, :user
     attr_accessor :token, :token_type, :cached
     private :token=, :token_type=, :cached=
 
-    def initialize(installation_id: nil, auto_open: true, code: nil, skip_cache: false)
+    def initialize(installation_id: nil, auto_open: true, code: nil, skip_cache: false, user: nil)
       @installation_id = installation_id || Apptokit.config.installation_id
       @auto_open = auto_open.nil? ? true : auto_open
       @code = code
       @cached = true
       @skip_cache = skip_cache
+      @user = user
       @mutex, @condition_variable = Mutex.new, ConditionVariable.new
     end
 
@@ -73,7 +74,7 @@ module Apptokit
     end
 
     def cache_key
-      "user:#{installation_id}"
+      "user:#{installation_id}:#{user}"
     end
 
     def generate_oauth_code
@@ -115,7 +116,10 @@ module Apptokit
     end
 
     def oauth_url(callback_url)
-      @oauth_url ||= "#{Apptokit.config.github_url}/login/oauth/authorize?client_id=#{client_id}&callback_url=#{callback_url}"
+      @oauth_url ||= begin
+        login_value = user.nil? ? "" : "&login=#{user}"
+        "#{Apptokit.config.github_url}/login/oauth/authorize?client_id=#{client_id}#{login_value}&callback_url=#{callback_url}"
+      end
     end
 
     def validate_generateable!

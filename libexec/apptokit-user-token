@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
-# Usage: apptokit user-token [--no-auto-open] [oauth code]
+# Usage: apptokit user-token [--no-auto-open] [--force] [--code=<oauth code>] [--user=<user>]
 # Summary: Generate an User-Server token for a GitHub App installation.
 # Help: This command will attempt to auto generate a User authenticated token for a GitHub App.
 #
@@ -24,10 +24,26 @@
 
 require "setup"
 require "apptokit/user_token"
+require 'optparse'
 
-auto_open = ARGV.find { |arg| arg == "--no-auto-open" }
-code = ARGV.find {|str| str =~ /[a-z0-9]{20}/}
-force = (%w(-f --force) & ARGV).any?
+options = {skip_cache: false, auto_open: true, user: nil, code: nil}
+OptionParser.new do |opts|
+  opts.on("-f", "--force", "Don't use a cached token") do |v|
+    options[:skip_cache] = v
+  end
+
+  opts.on("-n", "--no-auto-open", "Don't automatically open the browser window") do |v|
+    options[:auto_open] = v
+  end
+
+  opts.on("-uUSER", "--user=USER", "The user to authorize") do |user|
+    options[:user] = user
+  end
+
+  opts.on("-cCODE", "--code=CODE", "The OAuth code received from GitHub") do |code|
+    options[:code] = code
+  end
+end.parse!
 
 DummyToken = Struct.new(:token) do
   def header
@@ -40,7 +56,7 @@ DummyToken = Struct.new(:token) do
 end
 
 token = ENV["APPTOKIT_USER_TOKEN"] && DummyToken.new(ENV["APPTOKIT_USER_TOKEN"])
-token ||= Apptokit::UserToken.generate(auto_open: !auto_open, code: code, skip_cache: force)
+token ||= Apptokit::UserToken.generate(options)
 
 if $stdout.isatty
   puts "Your token:"
