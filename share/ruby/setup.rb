@@ -139,6 +139,10 @@ module Apptokit
       !manifest_url.nil? || !manifest.nil?
     end
 
+    def clear_manifest_cache!
+      manifest_settings.delete_cache
+    end
+
     private
 
     def set_opts_from_hash(hash)
@@ -173,23 +177,25 @@ module Apptokit
       return if self.class.loading_manifest
       return unless env_from_manifest?
 
-      settings = ManifestApp::Settings.new(env, {
-        "manifest_url" => manifest_url,
-        "manifest"     => manifest
-      })
-
-      return unless settings.loaded? || realize_manifest?
+      return unless manifest_settings.loaded? || realize_manifest?
       self.class.loading_manifest do
-        settings.fetch
-        settings.apply(Apptokit.config)
-        settings.apply(self)
+        manifest_settings.fetch
+        manifest_settings.apply(Apptokit.config)
+        manifest_settings.apply(self)
       end
 
       if installation_id.nil?
-        settings.install_app
+        manifest_settings.install_app
       end
-      settings.apply(Apptokit.config)
-      settings.apply(self)
+      manifest_settings.apply(Apptokit.config)
+      manifest_settings.apply(self)
+    end
+
+    def manifest_settings
+      @manifest_settings ||= ManifestApp::Settings.new(env, {
+        "manifest_url" => manifest_url,
+        "manifest"     => manifest
+      })
     end
 
     def realize_manifest?
