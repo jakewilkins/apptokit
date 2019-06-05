@@ -64,7 +64,7 @@ module Apptokit
         block.call
         @loading_manifest = false
       else
-        @loading_manifest
+        @loading_manifest ||= nil
       end
     end
 
