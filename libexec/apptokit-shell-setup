@@ -48,14 +48,16 @@ if [ -z "$print" ]; then
   { echo "# Load apptokit automatically by adding"
     echo "# the following to ${profile}:"
     echo
-    echo "eval \"\$(${_APPTOKIT_ROOT}/bin/apptokit shell-setup -)\""
+    echo "/usr/bin/type -t _apptokit_wrapper 2>&1 >/dev/null || eval \"\$(${_APPTOKIT_ROOT}/bin/apptokit shell-setup -)\""
     echo
   } >&2
 
   exit 1
 fi
 
-echo "export PATH=\"\${PATH}:${_APPTOKIT_ROOT}/bin\""
+if [[ "$PATH" != *"${_APPTOKIT_ROOT}/bin"* ]]; then
+  echo "export PATH=\"\${PATH}:${_APPTOKIT_ROOT}/bin\""
+fi
 
 case "$shell" in
 bash | zsh )
