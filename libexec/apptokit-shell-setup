@@ -36,19 +36,22 @@ if [ -z "$print" ]; then
   case "$shell" in
   bash )
     profile='~/.bash_profile'
+    _type="type"
     ;;
   zsh )
     profile='~/.zshenv'
+    _type="/usr/bin/type"
     ;;
   * )
     profile='your profile'
+    _type="type"
     ;;
   esac
 
   { echo "# Load apptokit automatically by adding"
     echo "# the following to ${profile}:"
     echo
-    echo "/usr/bin/type -t _apptokit_wrapper 2>&1 >/dev/null || eval \"\$(${_APPTOKIT_ROOT}/bin/apptokit shell-setup -)\""
+    echo "$_type -t _apptokit_wrapper 2>&1 >/dev/null || eval \"\$(${_APPTOKIT_ROOT}/bin/apptokit shell-setup -)\""
     echo
   } >&2
 
