@@ -21,4 +21,4 @@ jobs:
         BATS_CLIENT_SECRET:  ${{ secrets.BATS_CLIENT_SECRET }}
         BATS_PRIVATE_KEY:  ${{ secrets.BATS_PRIVATE_KEY }}
       run: |
-        bats -p test/*.bats
+        bats -t test/*.bats
