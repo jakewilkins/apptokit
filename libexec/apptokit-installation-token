@@ -1,7 +1,8 @@
 #!/usr/bin/env ruby
-# Usage: apptokit installation-token
+# Usage: apptokit installation-token [--force]
 # Summary: Generate an installation token for a GitHub App installation.
 # Help: Generates an installation token for your app
+# - --force will ignore a cached token if one exists for your installation.
 
 require "setup"
 require "apptokit/installation_token"
