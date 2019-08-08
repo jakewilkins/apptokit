@@ -1,4 +1,4 @@
-name: Ruby
+name: Bats tests
 
 on: [push]
 
@@ -14,5 +14,11 @@ jobs:
         git clone https://github.com/sstephenson/bats
         sudo ./bats/install.sh /usr/local
     - name: Run tests
+      env:
+        BATS_APP_ID:  ${{ secrets.BATS_APP_ID }}
+        BATS_INSTALLATION_ID:  ${{ secrets.BATS_INSTALLATION_ID }}
+        BATS_CLIENT_ID:  ${{ secrets.BATS_CLIENT_ID }}
+        BATS_CLIENT_SECRET:  ${{ secrets.BATS_CLIENT_SECRET }}
+        BATS_PRIVATE_KEY:  ${{ secrets.BATS_PRIVATE_KEY }}
       run: |
-        bats --help
+        bats -p test/*.bats
