@@ -2,15 +2,17 @@
 
 load test_helper
 
-KEYCACHE="$HOME/.config/apptokit/.apptokit_bats_keycache.db"
+KEYCACHE="$HOME/.config/apptokit/.apptokit_bats_keycache"
 
 function setup {
   [ ! -d ~/.config/apptokit ] && mkdir -p ~/.config/apptokit
-  cp ./test/keycache_db.db "$KEYCACHE"
+  cp ./test/keycache.db "$KEYCACHE"
 }
 
 function teardown {
-  [ -f "$KEYCACHE" ] && rm $KEYCACHE
+  if [[ -f "$KEYCACHE" ]]; then
+    rm $KEYCACHE
+  fi
 }
 
 @test "show lists values in keycache" {

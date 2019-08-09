@@ -3,7 +3,7 @@
 load test_helper
 
 function teardown {
-  $APPTOKIT keycache drop all
+  $APPTOKIT keycache drop all >&2
 }
 
 @test "fetches an installation token" {
