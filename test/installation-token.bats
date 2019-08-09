@@ -13,6 +13,9 @@ function teardown {
 
   run $APPTOKIT installation-token
 
+  if [ ! "$status" -eq 0 ]; then
+    echo "$output" >&2
+  fi
   [ "$status" -eq 0 ]
   [[ "$output" == "token v1."* ]]
 }
@@ -24,11 +27,17 @@ function teardown {
 
   first_token="$output"
 
+  if [ ! "$status" -eq 0 ]; then
+    echo "$output" >&2
+  fi
   [ "$status" -eq 0 ]
   [[ "$output" == "token v1."* ]]
 
   run $APPTOKIT installation-token
 
+  if [ ! "$status" -eq 0 ]; then
+    echo "$output" >&2
+  fi
   [ "$status" -eq 0 ]
   [[ "$output" == "token v1."* ]]
   [ "$first_token" = "$output" ]
@@ -41,11 +50,17 @@ function teardown {
 
   first_token="$output"
 
+  if [ ! "$status" -eq 0 ]; then
+    echo "$output" >&2
+  fi
   [ "$status" -eq 0 ]
   [[ "$output" == "token v1."* ]]
 
   run $APPTOKIT installation-token --force
 
+  if [ ! "$status" -eq 0 ]; then
+    echo "$output" >&2
+  fi
   [ "$status" -eq 0 ]
   [[ "$output" == "token v1."* ]]
   [ "$first_token" != "$output" ]
