@@ -1,0 +1,15 @@
+
+require "rake/testtask"
+
+task :env do |t|
+  system("./test/setup.sh")
+end
+
+
+Rake::TestTask.new(test: :env) do |t|
+  t.libs << "test"
+  t.libs << "share/ruby"
+  t.test_files = FileList['test/**/*_test.rb']
+end
+
+task default: :test
