@@ -13,6 +13,7 @@ jobs:
       run: |
         git clone https://github.com/sstephenson/bats
         sudo ./bats/install.sh /usr/local
+        rm -rf ./bats
     - name: Run tests
       env:
         BATS_APP_ID:  ${{ secrets.BATS_APP_ID }}
