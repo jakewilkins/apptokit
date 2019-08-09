@@ -3,13 +3,13 @@
 load test_helper
 
 function teardown {
-  apptokit keycache drop all
+  $APPTOKIT keycache drop all
 }
 
 @test "fetches an installation token" {
   setup_apptokit_env
 
-  run apptokit installation-token
+  run $APPTOKIT installation-token
 
   [ "$status" -eq 0 ]
   [[ "$output" == "token v1."* ]]
@@ -18,14 +18,14 @@ function teardown {
 @test "uses cached result if available" {
   setup_apptokit_env
 
-  run apptokit installation-token
+  run $APPTOKIT installation-token
 
   first_token="$output"
 
   [ "$status" -eq 0 ]
   [[ "$output" == "token v1."* ]]
 
-  run apptokit installation-token
+  run $APPTOKIT installation-token
 
   [ "$status" -eq 0 ]
   [[ "$output" == "token v1."* ]]
@@ -35,14 +35,14 @@ function teardown {
 @test "ignores cached result if available and --force option is supplied" {
   setup_apptokit_env
 
-  run apptokit installation-token
+  run $APPTOKIT installation-token
 
   first_token="$output"
 
   [ "$status" -eq 0 ]
   [[ "$output" == "token v1."* ]]
 
-  run apptokit installation-token --force
+  run $APPTOKIT installation-token --force
 
   [ "$status" -eq 0 ]
   [[ "$output" == "token v1."* ]]
