@@ -1,4 +1,6 @@
 
+mkdir -p ~/.config/apptokit
+
 [ -f "./.apptokit.yml" ] && rm .apptokit.yml
 eval "echo \"$(cat test/env.yml)\"" > ./.apptokit.yml
 
