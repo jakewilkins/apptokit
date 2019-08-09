@@ -49,4 +49,4 @@ function teardown {
   [ "$first_token" != "$output" ]
 }
 
-# vim: set ft=bash:
+# vim: set ft=bash
