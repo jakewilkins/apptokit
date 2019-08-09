@@ -4,8 +4,8 @@ require "apptokit/key_cache"
 
 class KeyCacheTest < TestCase
   CONFIG_DIR = "#{ENV["HOME"]}/.config/apptokit"
-  TEST_KEYCACHE = "./test/keycache_db.db"
-  KEYCACHE = "#{ENV['HOME']}/.config/apptokit/.apptokit_bats_keycache.db"
+  TEST_KEYCACHE = "./test/keycache.db"
+  KEYCACHE = "#{ENV['HOME']}/.config/apptokit/.apptokit_bats_keycache"
 
   def setup
     FileUtils.mkdir_p(CONFIG_DIR)
