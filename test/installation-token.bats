@@ -3,7 +3,9 @@
 load test_helper
 
 function teardown {
-  $APPTOKIT keycache drop all >&2
+  if [[ -f "$KEYCACHE" ]]; then
+    rm $KEYCACHE
+  fi
 }
 
 @test "fetches an installation token" {
@@ -11,6 +13,7 @@ function teardown {
 
   run $APPTOKIT installation-token
 
+  if [ ! "$status" ]
   [ "$status" -eq 0 ]
   [[ "$output" == "token v1."* ]]
 }
