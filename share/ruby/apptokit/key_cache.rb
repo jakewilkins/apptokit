@@ -37,6 +37,7 @@ module Apptokit
 
     def set(key, value, expiry, return_expiry: false)
       db[key] = "#{value}:::#{format_expiration(expiry)}"
+      save!
 
       if return_expiry
         [value, expiry]
@@ -55,7 +56,7 @@ module Apptokit
     end
 
     def drop(key)
-      db.delete(key)
+      db.delete(key).tap { save! }
     end
 
     def clear

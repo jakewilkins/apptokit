@@ -61,11 +61,34 @@ class KeyCacheTest < TestCase
     assert_equal expiry.iso8601, rexpiry.iso8601
   end
 
+  def test_setting_keys_perists_between_instances
+    key = "test"
+    value = "foobar"
+    expiry = DateTime.now + 10
+
+    rvalue, rexpiry = cache.set(key, value, expiry, return_expiry: true)
+    assert_equal value, rvalue
+    assert_equal expiry.iso8601, rexpiry.iso8601
+
+    assert_equal value, cache.get(key)
+
+    rvalue, rexpiry = Apptokit::KeyCache.new.get(key, return_expiry: true)
+    assert_equal value, rvalue
+    assert_equal expiry.iso8601, rexpiry.iso8601
+  end
+
   def test_dropping_keys
     key = "user:1410449:"
     refute_nil cache.get(key)
     cache.drop(key)
     assert_nil cache.get(key)
+  end
+
+  def test_dropping_keys_persists_between_instances
+    key = "user:1410449:"
+    refute_nil cache.get(key)
+    cache.drop(key)
+    assert_nil Apptokit::KeyCache.new.get(key)
   end
 
   def test_clearing_keys
