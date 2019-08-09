@@ -13,7 +13,6 @@ function teardown {
 
   run $APPTOKIT installation-token
 
-  if [ ! "$status" ]
   [ "$status" -eq 0 ]
   [[ "$output" == "token v1."* ]]
 }
