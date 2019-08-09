@@ -2,6 +2,9 @@ require 'minitest/autorun'
 
 ENV['GH_ENV'] = 'bats'
 
+vendor_dir = File.join(File.dirname(File.dirname(__FILE__)), "share/ruby/vendor")
+ENV['GEM_PATH']="#{vendor_dir}/ruby/2.4.0:#{ENV['GEM_PATH']}"
+
 require 'setup'
 
 
