@@ -82,7 +82,7 @@ module Apptokit
 
     def private_key
       @private_key ||= begin
-        unless private_key_path && !private_key_path.empty?
+        unless private_key_path && !private_key_path.to_s.empty?
           raise ApptokitError.new("Private key path not set but required for using a private key.")
         end
         OpenSSL::PKey::RSA.new(File.read(private_key_path))

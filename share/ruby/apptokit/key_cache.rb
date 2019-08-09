@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
-require 'dbm'
+require 'json'
+require 'base64'
 require 'date'
 
 module Apptokit
@@ -8,7 +9,7 @@ module Apptokit
     attr_reader :db
 
     def initialize
-      @db = DBM.open(db_file_path, 0600, DBM::WRCREAT)
+      @db = load_persisted_db || {}
     end
 
     def keys
@@ -36,6 +37,7 @@ module Apptokit
 
     def set(key, value, expiry, return_expiry: false)
       db[key] = "#{value}:::#{format_expiration(expiry)}"
+      save!
 
       if return_expiry
         [value, expiry]
@@ -54,14 +56,24 @@ module Apptokit
     end
 
     def drop(key)
-      db.delete(key)
+      db.delete(key).tap { save! }
     end
 
     def clear
-      db.clear
+      FileUtils.rm(db_file_path) if File.exist?(db_file_path)
+      @db = {}
     end
 
     private
+
+    def load_persisted_db
+      return nil unless File.exist?(db_file_path)
+      JSON.parse(Base64.decode64(File.read(db_file_path)))
+    end
+
+    def save!
+      File.write(db_file_path, Base64.encode64(JSON.generate(db)))
+    end
 
     def format_expiration(expiry, iso8601: true)
       expiry = case expiry

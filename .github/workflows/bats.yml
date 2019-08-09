@@ -1,0 +1,34 @@
+name: Bats tests
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        ruby:  [ '2.3.x', '2.6.x' ]
+
+    name: Ruby ${{ matrix.ruby }}
+    steps:
+    - uses: actions/checkout@master
+    - name: Set up Ruby 2.6
+      uses: actions/setup-ruby@v1
+      with:
+        version: ${{ matrix.ruby }}
+        architecture: 'x64'
+    - name: Set up Bats
+      run: |
+        git clone https://github.com/sstephenson/bats
+        sudo ./bats/install.sh /usr/local
+        rm -rf ./bats
+    - name: Run tests
+      env:
+        BATS_APP_ID:  ${{ secrets.BATS_APP_ID }}
+        BATS_INSTALLATION_ID:  ${{ secrets.BATS_INSTALLATION_ID }}
+        BATS_CLIENT_ID:  ${{ secrets.BATS_CLIENT_ID }}
+        BATS_CLIENT_SECRET:  ${{ secrets.BATS_CLIENT_SECRET }}
+        BATS_PRIVATE_KEY:  ${{ secrets.BATS_PRIVATE_KEY }}
+      run: |
+        bats -t test/*.bats
