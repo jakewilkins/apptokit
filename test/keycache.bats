@@ -2,8 +2,6 @@
 
 load test_helper
 
-KEYCACHE="$HOME/.config/apptokit/.apptokit_bats_keycache"
-
 function setup {
   [ ! -d ~/.config/apptokit ] && mkdir -p ~/.config/apptokit
   cp ./test/keycache.db "$KEYCACHE"
