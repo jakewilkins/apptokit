@@ -5,7 +5,8 @@ task :env do |t|
   system("./test/setup.sh")
 end
 
-
+vendor_dir = File.join(File.dirname(File.dirname(__FILE__)), "share/ruby/vendor")
+ENV['GEM_PATH']="#{vendor_dir}/ruby/2.4.0:#{ENV['GEM_PATH']}"
 Rake::TestTask.new(test: :env) do |t|
   t.libs << "test"
   t.libs << "share/ruby"
