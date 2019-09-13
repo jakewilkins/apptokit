@@ -72,5 +72,5 @@ when "drop"
   end
 end
 
-#// vim: set ft=ruby
+# vim: set ft=ruby:
 

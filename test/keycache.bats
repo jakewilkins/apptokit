@@ -63,4 +63,4 @@ deleted keys:
   [[ "$output" == *"user:1410449"* ]]
   [[ "$output" != *"installation:1410449"* ]]
 }
-# vim set: ft=bash
+# vim: set ft=sh:

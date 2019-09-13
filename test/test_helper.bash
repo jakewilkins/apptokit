@@ -1,5 +1,5 @@
 
-export PATH="../bin:$PATH"
+export PATH="./bin:$PATH"
 export GH_ENV=bats
 export APPTOKIT="./bin/apptokit"
 
