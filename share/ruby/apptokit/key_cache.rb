@@ -6,9 +6,10 @@ require 'date'
 
 module Apptokit
   class KeyCache
-    attr_reader :db
+    attr_reader :db, :db_path
 
-    def initialize
+    def initialize(path: nil)
+      @db_path = path || db_file_path
       @db = load_persisted_db || {}
     end
 
@@ -67,8 +68,10 @@ module Apptokit
     private
 
     def load_persisted_db
-      return nil unless File.exist?(db_file_path)
-      JSON.parse(Base64.decode64(File.read(db_file_path)))
+      return nil unless File.exist?(db_path)
+      contents = File.read(db_path)
+      return nil if contents.nil? || contents.empty?
+      JSON.parse(Base64.decode64(contents))
     end
 
     def save!
