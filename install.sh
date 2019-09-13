@@ -91,6 +91,10 @@ function uninstall {
   db_glob="$(ls ~/.config/.apptokit_*_keycache.db 2>/dev/null)"
   set -e
   [ ! -z "$db_glob" ] && { echo "removing key caches $db_glob"; rm $db_glob; }
+  set +e
+  db_glob="$(ls ~/.config/.apptokit_*_keycache 2>/dev/null)"
+  set -e
+  [ ! -z "$db_glob" ] && { echo "removing key caches $db_glob"; rm $db_glob; }
   echo "uninstall complete."
 }
 
