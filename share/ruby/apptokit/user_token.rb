@@ -60,6 +60,14 @@ module Apptokit
       Apptokit.config.client_secret
     end
 
+    def user_agent
+      Apptokit.config.user_agent
+    end
+
+    def cookie
+      Apptokit.config.cookie
+    end
+
     private
 
     def perform_generation
@@ -110,8 +118,19 @@ module Apptokit
     def exchange_code_for_token(code)
       uri = URI("#{Apptokit.config.github_url}/login/oauth/access_token?")
 
-      res = Net::HTTP.post_form(uri, "client_id" => client_id,
-                "client_secret" => client_secret, "code" => code)
+      body = URI.encode_www_form({
+        "client_id" => client_id,
+        "client_secret" => client_secret,
+        "code" => code
+      })
+
+      headers = {
+        "Content-Type" => "application/x-www-form-urlencoded",
+        "User-Agent"   => user_agent,
+      }
+      headers["Cookie"] = cookie if cookie
+
+      res = Net::HTTP.post(uri, body, headers)
 
       case res
       when Net::HTTPSuccess
