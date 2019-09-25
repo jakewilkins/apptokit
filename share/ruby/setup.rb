@@ -6,6 +6,7 @@ require 'yaml'
 require 'uri'
 
 module Apptokit
+  VERSION = '0.1.0'
   ApptokitError = Class.new(RuntimeError)
 
   class Configuration
