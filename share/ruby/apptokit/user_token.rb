@@ -89,8 +89,14 @@ module Apptokit
         puts "Please open the link below to continue authorizing application:\n\n  #{oauth_url(callback_server.callback_url)}\n\n"
       end
 
-      mutex.synchronize { condition_variable.wait(mutex, 60) }
-      callback_server.shutdown
+      begin
+        mutex.synchronize { condition_variable.wait(mutex, 60) }
+      rescue Interrupt
+        puts "bye!"
+        exit!
+      ensure
+        callback_server.shutdown rescue nil
+      end
 
       unless callback_server.oauth_code
         raise ApptokitError.new(
