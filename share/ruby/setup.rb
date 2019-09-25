@@ -38,6 +38,10 @@ module Apptokit
 
       manifest_url
       manifest
+
+      user_agent
+      cookie
+      accept_header
     )
 
     DEFAULT_GITHUB_URL     = URI("https://github.com")
@@ -47,6 +51,8 @@ module Apptokit
     attr_accessor :client_id, :client_secret, :oauth_callback_port, :oauth_callback_bind, :oauth_callback_path, :oauth_callback_hostname
     attr_accessor :personal_access_token
     attr_accessor :manifest_url, :manifest
+    attr_accessor :cookie
+    attr_writer :user_agent, :accept_header
     attr_writer :private_key_path_glob, :keycache_file_path, :env, :user_keycache_expiry, :installation_keycache_expiry, :private_key
 
     def self.environments
@@ -134,6 +140,14 @@ module Apptokit
 
     def keycache_file_path
       @keycache_file_path ||= HOME_DIR_CONF_DIR.join(".apptokit_#{env || "global"}_keycache")
+    end
+
+    def user_agent
+      @user_agent ||= "Apptokit #{VERSION}"
+    end
+
+    def accept_header
+      @accept_header ||= "application/vnd.github.machine-man-preview+json, application/vnd.github.v3.text-match+json"
     end
 
     def env_from_manifest?
