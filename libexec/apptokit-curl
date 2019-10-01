@@ -64,7 +64,18 @@ if [[ "$1" == "--help" || "$1" == "-h" ]]; then
   echo
 fi
 
-PREVIEW_HEADER=${PREVIEW_HEADER:-"application/vnd.github.machine-man-preview+json, application/vnd.github.v3.text-match+json"}
+defaults=$(ruby -rsetup -e "print Apptokit.config.accept_header;print '~'; print Apptokit.config.user_agent; print '~'; print Apptokit.config.personal_access_token; print '~'; print Apptokit.config.github_api_url; print '~'; print Apptokit.config.cookie")
+config_header=`echo $defaults | cut -d '~' -f 1`
+# echo $config_header
+user_agent=`echo $defaults | cut -d '~' -f 2`
+# echo $user_agent
+pat=`echo $defaults | cut -d '~' -f 3`
+# echo $pat
+github_url=`echo $defaults | cut -d '~' -f 4`
+# echo $github_url
+cookie=`echo $defaults | cut -d '~' -f 5`
+# echo $cookie
+PREVIEW_HEADER=${PREVIEW_HEADER:-$config_header}
 
 request_type=$1
 
@@ -79,7 +90,7 @@ case "$request_type" in
     auth="$(apptokit app-token)"
     ;;
   "pat")
-    auth="token $(ruby -rsetup -e "print Apptokit.config.personal_access_token")"
+    auth="token $pat"
     ;;
   *)
     echo "You have to specify an authentication type for apptokit curl:"
@@ -103,11 +114,10 @@ if [ -z "$path" ]; then
 fi
 
 if [[ "$path" != *http* ]]; then
-  github_url=`ruby -rsetup -e "print Apptokit.config.github_api_url"`
   joiner=$([ ${path:0:1} == "/" ] && echo "" || echo "/")
   path="$github_url$joiner$path"
 fi
 
-user_agent=${USER_AGENT:-Apptokit}
+USER_AGENT=${USER_AGENT:-$user_agent}
 
-curl $request_method --user-agent "$user_agent" -H "Authorization: $auth" -H "Accept: $PREVIEW_HEADER" "$@" $path
+curl $request_method --user-agent "$USER_AGENT" -H "Authorization: $auth" -H "Accept: $PREVIEW_HEADER" "$@" $path
