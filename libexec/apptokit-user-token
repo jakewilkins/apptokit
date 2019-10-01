@@ -26,28 +26,18 @@ require "setup"
 require "apptokit/user_token"
 require 'optparse'
 
-options = {skip_cache: false, auto_open: true, user: nil, code: nil}
+options = {force: false, auto_open: true, user: nil, code: nil}
 OptionParser.new do |opts|
-  opts.on("-f", "--force", "Don't use a cached token") do |v|
-    options[:skip_cache] = v
-  end
+  opts.on("-f", "--force", "Don't use a cached token")
 
-  opts.on("-n", "--no-auto-open", "Don't automatically open the browser window") do |v|
-    options[:auto_open] = v
-  end
+  opts.on("-n", "--no-auto-open", "Don't automatically open the browser window")
 
-  opts.on("-uUSER", "--user=USER", "The user to authorize") do |user|
-    options[:user] = user
-  end
+  opts.on("-uUSER", "--user=USER", "The user to authorize")
 
-  opts.on("-cCODE", "--code=CODE", "The OAuth code received from GitHub") do |code|
-    options[:code] = code
-  end
+  opts.on("-cCODE", "--code=CODE", "The OAuth code received from GitHub")
 
-  opts.on("-rTOKEN", "--refresh-token=TOKEN", "The OAuth refresh token received from GitHub when access token is issued.") do |token|
-    options[:refresh_token] = token
-  end
-end.parse!
+  opts.on("-r [TOKEN]", "--refresh-token [TOKEN]", "The OAuth refresh token received from GitHub when access token is issued.")
+end.parse!(into: options)
 
 DummyToken = Struct.new(:token) do
   def header
@@ -64,10 +54,15 @@ DummyToken = Struct.new(:token) do
 end
 
 token = ENV["APPTOKIT_USER_TOKEN"] && DummyToken.new(ENV["APPTOKIT_USER_TOKEN"])
-token ||= if options[:refresh_token]
-  Apptokit::UserToken.refresh(token: options[:refresh_token])
+token ||= if options.has_key?(:"refresh-token")
+  Apptokit::UserToken.refresh(token: options[:"refresh-token"])
 else
   Apptokit::UserToken.generate(options)
+end
+
+if token.error?
+  puts token.error_description
+  exit 10
 end
 
 if $stdout.isatty
