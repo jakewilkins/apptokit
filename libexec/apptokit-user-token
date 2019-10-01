@@ -43,6 +43,10 @@ OptionParser.new do |opts|
   opts.on("-cCODE", "--code=CODE", "The OAuth code received from GitHub") do |code|
     options[:code] = code
   end
+
+  opts.on("-rTOKEN", "--refresh-token=TOKEN", "The OAuth refresh token received from GitHub when access token is issued.") do |token|
+    options[:refresh_token] = token
+  end
 end.parse!
 
 DummyToken = Struct.new(:token) do
@@ -53,15 +57,28 @@ DummyToken = Struct.new(:token) do
   def token_type
     "bearer"
   end
+
+  def refresh_token
+    nil
+  end
 end
 
 token = ENV["APPTOKIT_USER_TOKEN"] && DummyToken.new(ENV["APPTOKIT_USER_TOKEN"])
-token ||= Apptokit::UserToken.generate(options)
+token ||= if options[:refresh_token]
+  Apptokit::UserToken.refresh(token: options[:refresh_token])
+else
+  Apptokit::UserToken.generate(options)
+end
 
 if $stdout.isatty
   puts "Your token:"
   puts token.token
   puts "Token type: #{token.token_type}"
+  if token.refresh_token
+    puts "Expires in: #{token.expires_in}"
+    puts "Refresh token:\n#{token.refresh_token}"
+    puts "Refresh token expires in: #{token.refresh_token_expires_in}"
+  end
 else
   print token.header
 end
