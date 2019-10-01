@@ -19,7 +19,7 @@ Some useful apptokit commands are:
 See 'apptokit help <command>' for information on a specific command.
 ```
 
-### Getting Started
+## Getting Started
 
 `apptokit` ships with an installation script, [read it over][install-script-html].
 
@@ -36,6 +36,25 @@ the output from the install script.
 Apptokit uses environments to work with multiple GitHub Apps, so you can have a
 development app for testing new permissions and also a client configured for
 debugging your production app.
+
+### Quick start
+
+Apptokit works with GitHub App Manifests and it ships with one in the example template.
+
+Apptokit will walk you through creating the GitHub App specified in your manifest
+the first time you use it.
+
+You can try this out of the box like:
+
+```bash
+GH_ENV=manifest-app-env apptokit curl installation installation/repositories | jq
+```
+
+The first time you run this command you will be prompted to create a new GitHub
+App and install it on an account. Apptokit will cache the app information and use
+it for this environment.
+
+### Configuration
 
 Setting up a new environment happens with:
 
