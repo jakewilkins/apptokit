@@ -8,18 +8,23 @@ require 'apptokit/callback_server'
 
 module Apptokit
   class UserToken
-    def self.generate(auto_open: true, code: nil, skip_cache: false, user: nil)
-      new(auto_open: auto_open, code: code, skip_cache: skip_cache, user: user).tap {|t| t.generate}
+    def self.generate(auto_open: true, code: nil, force: false, user: nil)
+      new(auto_open: auto_open, code: code, skip_cache: force, user: user).tap {|t| t.generate}
+    end
+
+    def self.refresh(token:)
+      new(refresh_token: token).tap {|t| t.refresh}
     end
 
     attr_reader :auto_open, :installation_id, :mutex, :condition_variable, :skip_cache, :user
-    attr_accessor :token, :token_type, :cached
+    attr_accessor :token, :token_type, :cached, :refresh_token, :expires_in, :refresh_token_expires_in, :error_description
     private :token=, :token_type=, :cached=
 
-    def initialize(installation_id: nil, auto_open: true, code: nil, skip_cache: false, user: nil)
+    def initialize(installation_id: nil, auto_open: true, code: nil, skip_cache: false, user: nil, refresh_token: nil)
       @installation_id = installation_id || Apptokit.config.installation_id
       @auto_open = auto_open.nil? ? true : auto_open
       @code = code
+      @refresh_token = refresh_token
       @cached = true
       @skip_cache = skip_cache
       @user = user
@@ -35,19 +40,30 @@ module Apptokit
       if skip_cache
         self.cached = false
         perform_generation
-        Apptokit.keycache.set(cache_key, token, :user)
+        Apptokit.keycache.set(cache_key, cache_value, :user)
         return self
       end
 
       token = Apptokit.keycache.get_set(cache_key, :user) do
         self.cached = false
-        perform_generation.token
+        perform_generation
+        cache_value
       end
 
       if self.cached
-        self.token = token
-        self.token_type = "Bearer"
+        load_from(cache: token)
       end
+
+      self
+    end
+
+    def refresh
+      self.refresh_token || load_from(cache: true)
+
+      token_info = exchange_code_for_token(refresh_token, refresh: true)
+      load_from(response: token_info)
+
+      Apptokit.keycache.set(cache_key, cache_value, :user)
 
       self
     end
@@ -68,6 +84,14 @@ module Apptokit
       Apptokit.config.cookie
     end
 
+    def success?
+      !error?
+    end
+
+    def error?
+      !error_description.nil?
+    end
+
     private
 
     def perform_generation
@@ -76,8 +100,7 @@ module Apptokit
       oauth_code = generate_oauth_code
 
       token_info = exchange_code_for_token(oauth_code)
-      self.token = token_info["access_token"]
-      self.token_type = token_info["token_type"]
+      load_from(response: token_info)
       self
     end
 
@@ -115,14 +138,16 @@ module Apptokit
       callback_server.oauth_code
     end
 
-    def exchange_code_for_token(code)
+    def exchange_code_for_token(code, refresh: false)
+      key = refresh ? "refresh_token" : "code"
       uri = URI("#{Apptokit.config.github_url}/login/oauth/access_token?")
 
-      body = URI.encode_www_form({
+      body = {
         "client_id" => client_id,
         "client_secret" => client_secret,
-        "code" => code
-      })
+        key => code
+      }
+      body["grant_type"] = "refresh_token" if refresh
 
       headers = {
         "Content-Type" => "application/x-www-form-urlencoded",
@@ -130,7 +155,7 @@ module Apptokit
       }
       headers["Cookie"] = cookie if cookie
 
-      res = Net::HTTP.post(uri, body, headers)
+      res = Net::HTTP.post(uri, URI.encode_www_form(body), headers)
 
       case res
       when Net::HTTPSuccess
@@ -155,6 +180,29 @@ module Apptokit
       unless missing.empty?
         raise ApptokitError.new("Cannot create a User Token without: #{missing.join(", ")}.")
       end
+    end
+
+    def load_from(response: nil, cache: nil)
+      if response
+        self.token = response["access_token"]
+        self.token_type = response["token_type"]
+        self.expires_in = response["expires_in"]
+        self.refresh_token = response["refresh_token"]
+        self.refresh_token_expires_in = response["refresh_token_expires_in"]
+        self.error_description = response["error_description"]
+      end
+
+      cache = Apptokit.keycache.get(cache_key) if cache == true
+      if cache
+        token, refresh_token = cache.split("-")
+        self.token = token
+        self.refresh_token = refresh_token
+        self.token_type = "Bearer"
+      end
+    end
+
+    def cache_value
+      "#{token}-#{refresh_token}"
     end
   end
 end
