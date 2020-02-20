@@ -115,6 +115,7 @@ module Apptokit
         name: yaml_manifest["name"] || generated_name,
         url: yaml_manifest["url"] || "http://example.com",
         hook_attributes: yaml_manifest["hook_attributes"] || {url: "http://example.com/webhooks"},
+        callback_url: yaml_manifest["callback_url"] || "http://localhost:8075/callback",
         redirect_url: callback_server_url,
         description: yaml_manifest["description"] || "An Apptokit Managed GitHub App",
         public: yaml_manifest["public"] || false,
