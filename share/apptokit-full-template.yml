@@ -70,6 +70,7 @@ manifest-app-env:
   <<: *test_defaults
   manifest:
     name: Manifest App Name
+    callback_url: http://localhost:8075/callback
     permissions:
       metadata: read
       issues: write
