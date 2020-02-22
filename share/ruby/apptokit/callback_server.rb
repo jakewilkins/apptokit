@@ -44,7 +44,13 @@ module Apptokit
         [log_file, WEBrick::AccessLog::COMBINED_LOG_FORMAT],
       ]
 
-      @server = WEBrick::HTTPServer.new Port: port, Bind: bind, Logger: log, AccessLog: access_log
+      @server = WEBrick::HTTPServer.new(
+        Port: port,
+        Bind: bind,
+        Logger: log,
+        AccessLog: access_log,
+        ServerName: "Apptokit Callback Server"
+      )
       @server.mount_proc(path) do |req, res|
         self.request = req
         condition_variable.signal
@@ -52,9 +58,9 @@ module Apptokit
         res.body = RESPONSE_BODY
       end
 
-        @thread = Thread.new do
-          @server.start
-        end
+      @thread = Thread.new do
+        @server.start
+      end
     end
 
     def shutdown
