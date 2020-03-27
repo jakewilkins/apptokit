@@ -4,24 +4,93 @@ require 'webrick'
 
 module Apptokit
   class CallbackServer
-    RESPONSE_BODY = <<-HTML
+    AUTHORIZE_RESPONSE_BODY = <<-HTML
     <html>
+      <head>
+        <title>GitHub App Authorized</title>
+        <style>
+          #outer {
+            width: 100%;
+            /* Firefox */
+            display: -moz-box;
+            -moz-box-pack: center;
+            -moz-box-align: center;
+            /* Safari and Chrome */
+            display: -webkit-box;
+            -webkit-box-pack: center;
+            -webkit-box-align: center;
+            /* W3C */
+            display: box;
+            box-pack: center;
+            box-align: center;
+          }
+
+          #inner {
+            width: 50%;
+          }
+        </style>
+      </head>
       <body>
-        <h4>Sweet! You can close this window and return to your terminal</h4>
-        <iframe src="https://giphy.com/embed/GYH6LraGdVAru" width="480" height="269" frameBorder="0" class="giphy-embed" allowFullScreen></iframe><p><a href="https://giphy.com/gifs/GYH6LraGdVAru">via GIPHY</a></p>
+        <div id="outer">
+          <div id="inner">
+            <h4>Sweet! You can close this window and return to your terminal</h4>
+            <iframe src="https://giphy.com/embed/GYH6LraGdVAru" width="480" height="269" frameBorder="0" class="giphy-embed" allowFullScreen></iframe><p><a href="https://giphy.com/gifs/GYH6LraGdVAru">via GIPHY</a></p>
+          </div>
+        </div>
       </body>
     </html
     HTML
+
+    MANIFEST_RESPONSE_BODY = <<-HTML
+    <html>
+      <head>
+        <title>GitHub App created</title>
+        <style>
+          #outer {
+            width: 100%;
+            /* Firefox */
+            display: -moz-box;
+            -moz-box-pack: center;
+            -moz-box-align: center;
+            /* Safari and Chrome */
+            display: -webkit-box;
+            -webkit-box-pack: center;
+            -webkit-box-align: center;
+            /* W3C */
+            display: box;
+            box-pack: center;
+            box-align: center;
+          }
+
+          #inner {
+            width: 50%;
+          }
+        </style>
+      </head>
+      <body>
+        <div id="outer">
+          <div id="inner">
+            <h4>Sweet! You can install your new app now</h4>
+            <iframe src="https://giphy.com/embed/pO4UHglOY2vII" width="480" height="360" frameBorder="0" class="giphy-embed" allowFullScreen></iframe><p><a href="https://giphy.com/gifs/dancing-adventure-time-bmo-pO4UHglOY2vII">via GIPHY</a></p>
+          </div>
+        </div>
+      </body>
+    </html
+    HTML
+
     attr_reader :mutex, :condition_variable, :thread, :request, :server, :port, :bind, :path, :hostname
     attr_writer :request, :port, :bind, :path, :hostname
     private :mutex, :condition_variable, :thread, :request, :request=
 
-    def initialize(mutex, condition_variable, &block)
+    def initialize(mutex, condition_variable, response: :authorize, &block)
       @mutex, @condition_variable = mutex, condition_variable
       @port = Apptokit.config.oauth_callback_port.nil? ? 8075 : Apptokit.config.oauth_callback_port
       @bind = Apptokit.config.oauth_callback_bind || 'localhost'
       @path = Apptokit.config.oauth_callback_path || '/callback'
       @hostname = Apptokit.config.oauth_callback_hostname || 'localhost'
+      @response = response
+
+      @killed = false
 
       block.call(self) unless block.nil?
     end
@@ -55,11 +124,20 @@ module Apptokit
         self.request = req
         condition_variable.signal
         res["Content-Type"] = "text/html"
-        res.body = RESPONSE_BODY
+        res.body = response
       end
 
       @thread = Thread.new do
         @server.start
+      end
+    end
+
+    def response
+      case @response
+      when :authorize
+        AUTHORIZE_RESPONSE_BODY
+      when :manifest
+        MANIFEST_RESPONSE_BODY
       end
     end
 
