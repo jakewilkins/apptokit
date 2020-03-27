@@ -1,11 +1,40 @@
 <html>
+  <head>
+    <title>Create a GitHub App</title>
+    <style>
+      #outer {
+        width: 100%;
+        /* Firefox */
+        display: -moz-box;
+        -moz-box-pack: center;
+        -moz-box-align: center;
+        /* Safari and Chrome */
+        display: -webkit-box;
+        -webkit-box-pack: center;
+        -webkit-box-align: center;
+        /* W3C */
+        display: box;
+        box-pack: center;
+        box-align: center;
+      }
+
+      #inner {
+        width: 50%;
+      }
+    </style>
+  </head>
   <body>
-    <form action="<%= Apptokit.config.github_url %>/settings/apps/new" method="post">
-      Create a GitHub App Manifest:
-      <input type="textarea" name="manifest" id="manifest" value="<%= manifest_json %>">
-      <br>
-      <input type="submit" value="Create">
-    </form>
+    <div id="outer">
+      <div id="inner">
+        <form action="<%= Apptokit.config.github_url %>/settings/apps/new" method="post">
+          Create a GitHub App from the following manifest:
+          <textarea name="manifest" id="manifest" value="<%= manifest_json %>" hidden></textarea>
+          <br>
+          <pre><%= manifest_json %></pre>
+          <input type="submit" value="Create">
+        </form>
+      </div>
+    </div>
 
 		<script>
 		 input = document.getElementById("manifest");
