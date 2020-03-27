@@ -1,4 +1,4 @@
-#!/usr/bin/env ruby -w0
+#!/usr/bin/env ruby
 # Usage: apptokit env
 # Summary: Provide information about the currently configured GitHub App
 # Help:
@@ -71,7 +71,7 @@ if $stdout.isatty
       api_url = env.github_api_url == Apptokit::Configuration::DEFAULT_GITHUB_API_URL ? nil : env.github_api_url
       urls = [url, api_url].compact
       urls = urls.any? ? " (#{urls.join(", ")})" : ""
-      puts " - #{env.env}#{url}"
+      puts " - #{env.env}#{urls}"
     end
   elsif show_envs.any?
     show_envs.each do |env|
