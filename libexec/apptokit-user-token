@@ -53,15 +53,20 @@ DummyToken = Struct.new(:token) do
   end
 end
 
-token = ENV["APPTOKIT_USER_TOKEN"] && DummyToken.new(ENV["APPTOKIT_USER_TOKEN"])
-token ||= if options.has_key?(:"refresh-token")
-  Apptokit::UserToken.refresh(token: options[:"refresh-token"])
-else
-  Apptokit::UserToken.generate(options)
+begin
+  token = ENV["APPTOKIT_USER_TOKEN"] && DummyToken.new(ENV["APPTOKIT_USER_TOKEN"])
+  token ||= if options.has_key?(:"refresh-token")
+    Apptokit::UserToken.refresh(token: options[:"refresh-token"])
+  else
+    Apptokit::UserToken.generate(options)
+  end
+rescue Apptokit::ApptokitError => boom
+  $stderr.puts boom.message
+  exit 5
 end
 
 if token.error?
-  puts token.error_description
+  $stderr.puts token.error_description
   exit 10
 end
 
