@@ -52,8 +52,30 @@ module Apptokit
     end
 
     def install_app
-      return unless @manifest_app
-      app_settings["installation_id"] = @manifest_app.install_app
+      return unless loaded?
+      return if skip_app_installation?
+
+      install_url = "#{app_settings["html_url"]}/installations/new"
+      `$BROWSER #{install_url}`
+
+      sleep 2
+
+      installation, token = nil
+      count = 0
+      begin
+        count += 1
+        installations, token = get_installations(token)
+
+        installation = installations.first
+        sleep 2 unless installation
+      end while !installation && count < 10
+
+      unless installation
+        $stderr.puts "Unable to retrieve an installation id for #{yaml_manifest["name"] || generated_name}."
+        $stderr.puts "Please specify on manually in your apptokit.yml."
+      end
+
+      app_settings["installation_id"] = installation["id"]
       persist_to_cache(app_settings)
     end
 
@@ -81,6 +103,34 @@ module Apptokit
 
     def ensure_cache_dir_exists!
       FileUtils.mkdir_p(CACHE_DIR) unless CACHE_DIR.exist?
+    end
+
+    def get_installations(token = nil)
+      token ||= Apptokit::JWT.new.header
+      uri = URI("#{Apptokit.config.github_api_url}/app/installations")
+      # puts "fetching installations #{uri}"
+      response = Net::HTTP.start(uri.host, uri.port, use_ssl: uri.scheme == "https") do |http|
+        req = Net::HTTP::Get.new(uri)
+        req["Accept"] = "application/vnd.github.machine-man-preview+json"
+        req["Authorization"] = token
+
+        http.request(req)
+      end
+
+      case response
+      when Net::HTTPSuccess
+        parsed = JSON.parse(response.body)
+
+        [parsed, token]
+      else
+        sleep 0.1
+
+        [[], token]
+      end
+    end
+
+    def skip_app_installation?
+      ENV.has_key?("SKIP_INSTALLATION")
     end
   end
 end

@@ -40,7 +40,7 @@ module Apptokit
       tempfile.write(FORM_TEMPLATE.result(binding))
       tempfile.flush
 
-      callback_server = CallbackServer.new(mutex, condition_variable) do |server|
+      callback_server = CallbackServer.new(mutex, condition_variable, response: :manifest) do |server|
         server.port = 8875
         server.path = "/manifest_callback"
       end
@@ -54,6 +54,11 @@ module Apptokit
 
       mutex.synchronize { condition_variable.wait(mutex, 60) }
       callback_server.shutdown
+
+      if callback_server.killed?
+        $stderr.puts "Aborting manifest setup process, the App will not be created."
+        exit
+      end
 
       unless callback_server.code
         raise ApptokitError.new(
@@ -79,35 +84,6 @@ module Apptokit
       else
         raise ApptokitError.new("Failed to exchange GitHub App Manifest code for App credentials: #{res.code}\n\n#{res.body}")
       end
-    end
-
-    def install_app
-      return unless @github_settings_response
-      return if skip_app_installation?
-
-      install_url = "#{@github_settings_response["html_url"]}/installations/new"
-      `$BROWSER #{install_url}`
-
-      sleep 2
-
-      installation, token = nil
-      count = 0
-      begin
-        count += 1
-        installations, token = get_installations(token)
-
-        installation = installations.first
-        sleep 2 unless installation
-      end while !installation && count < 10
-
-      if installation
-        return installation["id"]
-      else
-        $stderr.puts "Unable to retrieve an installation id for #{yaml_manifest["name"] || generated_name}."
-        $stderr.puts "Please specify on manually in your apptokit.yml."
-      end
-
-      nil
     end
 
     def manifest_json
@@ -149,34 +125,6 @@ module Apptokit
         $stderr.puts "Could not fetch an App Manifest from #{yaml_conf["manifest_url"]}"
         exit 20
       end
-    end
-
-    def get_installations(token = nil)
-      token ||= Apptokit::JWT.new.header
-      uri = URI("#{Apptokit.config.github_api_url}/app/installations")
-      puts "fetching installations #{uri}"
-      response = Net::HTTP.start(uri.host, uri.port, use_ssl: uri.scheme == "https") do |http|
-        req = Net::HTTP::Get.new(uri)
-        req["Accept"] = "application/vnd.github.machine-man-preview+json"
-        req["Authorization"] = token
-
-        http.request(req)
-      end
-
-      case response
-      when Net::HTTPSuccess
-        parsed = JSON.parse(response.body)
-
-        [parsed, token]
-      else
-        sleep 0.1
-
-        [[], token]
-      end
-    end
-
-    def skip_app_installation?
-      ENV.has_key?("SKIP_INSTALLATION")
     end
   end
 end
