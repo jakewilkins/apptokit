@@ -62,7 +62,7 @@ module Apptokit
           envs += (YAML.load_file(path).keys - YAML_OPTS)
         end
       end
-      envs - %w(default_env)
+      (envs - %w(default_env)).reject { |e| /_defaults/.match?(e) }
     end
 
     def self.loading_manifest(&block)
