@@ -160,6 +160,8 @@ module Apptokit
       case res
       when Net::HTTPSuccess
         Hash[URI.decode_www_form(res.body)]
+      when Net::HTTPRedirection
+        raise ApptokitError.new("Redirected during token create, possibly a cookie issue? Location: #{res["Location"]}")
       else
         raise ApptokitError.new("Failed to exchange OAuth code for token: #{res.code}\n\n#{res.body}")
       end
