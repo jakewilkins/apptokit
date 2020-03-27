@@ -30,6 +30,7 @@ fi
 #!ruby
 
 ENV["LIMITED_MANIFEST"] = 'true'
+ENV["INSTALLING_APP"] = 'true'
 
 require "setup"
 

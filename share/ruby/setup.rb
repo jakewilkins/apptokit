@@ -192,18 +192,30 @@ module Apptokit
       return if self.class.loading_manifest
       return unless env_from_manifest?
 
-      return unless manifest_settings.loaded? || realize_manifest?
-      self.class.loading_manifest do
-        manifest_settings.fetch
-        manifest_settings.apply(Apptokit.config)
-        manifest_settings.apply(self)
+
+      if !manifest_settings.loaded? && realize_manifest?
+        self.class.loading_manifest do
+          manifest_settings.fetch
+          manifest_settings.apply(Apptokit.config)
+          manifest_settings.apply(self)
+        end
       end
 
-      if installation_id.nil?
-        manifest_settings.install_app
+      if manifest_settings.loaded?
+        self.class.loading_manifest do
+          manifest_settings.apply(Apptokit.config)
+          manifest_settings.apply(self)
+        end
       end
-      manifest_settings.apply(Apptokit.config)
-      manifest_settings.apply(self)
+
+      if installation_id.nil? && !installing_app?
+        manifest_settings.install_app
+
+        self.class.loading_manifest do
+          manifest_settings.apply(Apptokit.config)
+          manifest_settings.apply(self)
+        end
+      end
     end
 
     def manifest_settings
@@ -215,6 +227,10 @@ module Apptokit
 
     def realize_manifest?
       !ENV.has_key?("LIMITED_MANIFEST")
+    end
+
+    def installing_app?
+      ENV.has_key?("INSTALLING_APP")
     end
   end
 

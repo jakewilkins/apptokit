@@ -55,6 +55,8 @@ module Apptokit
       return unless loaded?
       return if skip_app_installation?
 
+      ENV["INSTALLING_APP"] = "true"
+
       install_url = "#{app_settings["html_url"]}/installations/new"
       `$BROWSER #{install_url}`
 
