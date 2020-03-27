@@ -107,6 +107,8 @@ module Apptokit
     alias code oauth_code
 
     def start
+      setup_signal_handlers
+
       log_file = File.open('/dev/null', 'a+')
       log = WEBrick::Log.new(log_file)
       access_log = [
@@ -143,6 +145,17 @@ module Apptokit
 
     def shutdown
       @server.shutdown
+    end
+
+    def killed?
+      @killed
+    end
+
+    def setup_signal_handlers
+      Signal.trap("INT") do
+        @killed = true
+        shutdown
+      end
     end
   end
 end
