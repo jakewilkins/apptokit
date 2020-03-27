@@ -143,7 +143,7 @@ module Apptokit
     end
 
     def user_agent
-      @user_agent ||= "Apptokit #{VERSION}"
+      @user_agent ||= ENV["USER_AGENT"] || "Apptokit #{VERSION}"
     end
 
     def accept_header
