@@ -1,0 +1,68 @@
+#!/bin/bash
+# Usage: apptokit manifest <show|drop> [key type]
+# Summary: Work with the cached manifest settings for this Apptokit ENV
+# provide apptokit completions
+# Help:
+#   Show or remove entries from the cached manifest settings. Useful if you find yourself in
+#   a bad state.
+#
+#   create      -  create App from the manifest
+#   show        -  list entries in the cache
+#   install     -  install the App on an account
+#   drop        -  remove entries from the cache
+#
+
+if [[ "$1" == "--complete" ]]; then
+  echo "show"
+  echo "drop"
+  echo "install"
+  echo "create"
+  exit
+else
+  if [[ ! "$1" =~ ^(show|drop|create|install)$ ]]; then
+    (>&2 echo "invalid manifest command '$1'")
+    apptokit help manifest
+    exit 4
+  fi
+  exec "$(which ruby)" "$0" "$@"
+fi
+
+#!ruby
+
+ENV["LIMITED_MANIFEST"] = 'true'
+
+require "setup"
+
+config = Apptokit.config
+manifest = config.send(:manifest_settings)
+
+case ARGV.shift
+when "create"
+  if manifest.loaded?
+    puts "Manifest already created, run `manifest drop` to remove it. Printed below for reference:"
+    pp manifest.app_settings
+    exit
+  end
+
+  Apptokit::Configuration.loading_manifest do
+    manifest.fetch
+  end
+  puts "Manifest App created for #{config.env}"
+  pp manifest.app_settings
+when "install"
+  manifest.install_app
+when "show"
+  puts "Manifest for env: #{config.env}"
+  if manifest.loaded?
+    pp manifest.app_settings
+  else
+    puts "Manifest App not created, would create with:"
+    pp manifest.yaml_conf
+  end
+when "drop"
+  puts "dropping manifest for env: #{config.env}"
+  config.clear_manifest_cache!
+  puts "done."
+end
+
+# vim: set ft=ruby:
