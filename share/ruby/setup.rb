@@ -166,6 +166,13 @@ module Apptokit
       manifest_settings.delete_cache
     end
 
+    def debug(msg = nil, &block)
+      return unless debug?
+      return block.call if block
+
+      $stderr.puts msg
+    end
+
     private
 
     def set_opts_from_hash(hash)
@@ -239,6 +246,10 @@ module Apptokit
 
     def installing_app?
       ENV.has_key?("INSTALLING_APP")
+    end
+
+    def debug?
+      ENV.has_key?("DEBUG")
     end
   end
 

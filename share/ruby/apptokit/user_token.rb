@@ -16,14 +16,18 @@ module Apptokit
       new(refresh_token: token).tap {|t| t.refresh}
     end
 
-    attr_reader :auto_open, :installation_id, :mutex, :condition_variable, :skip_cache, :user
+    def self.get_code(auto_open: true, user: nil)
+      new(auto_open: auto_open, user: user).tap {|t| t.get_code}
+    end
+
+    attr_reader :auto_open, :installation_id, :mutex, :condition_variable, :skip_cache, :user, :oauth_code
     attr_accessor :token, :token_type, :cached, :refresh_token, :expires_in, :refresh_token_expires_in, :error_description
     private :token=, :token_type=, :cached=
 
     def initialize(installation_id: nil, auto_open: true, code: nil, skip_cache: false, user: nil, refresh_token: nil)
       @installation_id = installation_id || Apptokit.config.installation_id
       @auto_open = auto_open.nil? ? true : auto_open
-      @code = code
+      @oauth_code = code
       @refresh_token = refresh_token
       @cached = true
       @skip_cache = skip_cache
@@ -68,6 +72,10 @@ module Apptokit
       self
     end
 
+    def get_code
+      generate_oauth_code
+    end
+
     def client_id
       Apptokit.config.client_id
     end
@@ -109,7 +117,7 @@ module Apptokit
     end
 
     def generate_oauth_code
-      return @code if @code
+      return @oauth_code if @oauth_code
 
       callback_server = CallbackServer.new(mutex, condition_variable)
       callback_server.start
@@ -135,7 +143,7 @@ module Apptokit
         )
       end
 
-      callback_server.oauth_code
+      @oauth_code = callback_server.oauth_code
     end
 
     def exchange_code_for_token(code, refresh: false)
@@ -161,6 +169,11 @@ module Apptokit
       when Net::HTTPSuccess
         Hash[URI.decode_www_form(res.body)]
       when Net::HTTPRedirection
+        Apptokit.config.debug do
+          p headers
+          p uri, body
+          puts "Redirected to #{res["Location"]}"
+        end
         raise ApptokitError.new("Redirected during token create, possibly a cookie issue? Location: #{res["Location"]}")
       else
         raise ApptokitError.new("Failed to exchange OAuth code for token: #{res.code}\n\n#{res.body}")

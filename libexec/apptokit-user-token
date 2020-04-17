@@ -36,6 +36,8 @@ OptionParser.new do |opts|
 
   opts.on("-cCODE", "--code=CODE", "The OAuth code received from GitHub")
 
+  opts.on("-g", "--get-code", "Authorize user for OAuth code from GitHub and exit")
+
   opts.on("-r [TOKEN]", "--refresh-token [TOKEN]", "The OAuth refresh token received from GitHub when access token is issued.")
 end.parse!(into: options)
 
@@ -57,6 +59,8 @@ begin
   token = ENV["APPTOKIT_USER_TOKEN"] && DummyToken.new(ENV["APPTOKIT_USER_TOKEN"])
   token ||= if options.has_key?(:"refresh-token")
     Apptokit::UserToken.refresh(token: options[:"refresh-token"])
+  elsif options.has_key?(:"get-code")
+    Apptokit::UserToken.get_code(auto_open: options[:auto_open], user: options[:user])
   else
     Apptokit::UserToken.generate(options)
   end
@@ -68,6 +72,15 @@ end
 if token.error?
   $stderr.puts token.error_description
   exit 10
+end
+
+if options[:"get-code"]
+  if $stdout.isatty
+    puts "Your OAuth code: #{token.oauth_code}"
+  else
+    print token.oauth_code
+  end
+  exit 0
 end
 
 if $stdout.isatty
