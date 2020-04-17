@@ -45,8 +45,14 @@ when "create"
     exit
   end
 
-  Apptokit::Configuration.loading_manifest do
-    manifest.fetch
+  begin
+    Apptokit::Configuration.loading_manifest do
+      manifest.fetch
+    end
+  rescue Apptokit::ApptokitError => boom
+    raise boom unless boom.type == :manifest_creation_failed
+    $stderr.puts boom.message
+    exit 6
   end
   puts "Manifest App created for #{config.env}"
   pp manifest.app_settings

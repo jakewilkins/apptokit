@@ -62,7 +62,8 @@ module Apptokit
 
       unless callback_server.code
         raise ApptokitError.new(
-          "Failed to get an manifest creation code from GitHub, did you visit the URL in your browser?"
+          "Failed to get an manifest creation code from GitHub, did you visit the URL in your browser?",
+          type: :manifest_creation_failed
         )
       end
 

@@ -7,7 +7,15 @@ require 'uri'
 
 module Apptokit
   VERSION = '0.1.0'
-  ApptokitError = Class.new(RuntimeError)
+
+  class ApptokitError < RuntimeError
+    attr_reader :type
+
+    def initialize(msg, type: nil)
+      @type = type
+      super(msg)
+    end
+  end
 
   class Configuration
     HOME_DIR_CONF_PATH = Pathname.new(ENV["HOME"]).join(".config/apptokit.yml")
