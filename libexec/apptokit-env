@@ -24,6 +24,7 @@
 # environments to trigger walking through the manifest creation
 # flow
 ENV["LIMITED_MANIFEST"] = 'yuh'
+ENV["INSTALLING_APP"] = 'true'
 
 require "setup"
 
