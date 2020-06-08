@@ -15,13 +15,14 @@ module Apptokit
       Configuration::SHARE_DIR.join("create_manifest_app.html.erb").read
     )
 
-    attr_reader :env_name, :yaml_conf, :mutex, :condition_variable, :auto_open, :code, :skip_cache
+    attr_reader :env_name, :yaml_conf, :app_owner, :mutex, :condition_variable, :auto_open, :code, :skip_cache
     attr_writer :code
     private :code=
 
-    def initialize(env_name:, yaml_conf:, auto_open: nil, code: nil, skip_cache: false)
+    def initialize(env_name:, yaml_conf:, app_owner:, auto_open: nil, code: nil, skip_cache: false)
       @env_name = env_name
       @yaml_conf = yaml_conf
+      @app_owner = app_owner
       @auto_open = auto_open.nil? ? true : auto_open
       @code = code
       @cached = true
@@ -114,6 +115,11 @@ module Apptokit
         yaml_conf["manifest"] = fetch_manifest_from_url
       end
       yaml_conf["manifest"]
+    end
+
+    def manifest_flow_start_url
+      owner_part = app_owner ? "/organizations/#{app_owner}" : ""
+      "#{Apptokit.config.github_url}#{owner_part}/settings/apps/new"
     end
 
     def fetch_manifest_from_url

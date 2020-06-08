@@ -46,6 +46,7 @@ module Apptokit
 
       manifest_url
       manifest
+      app_owner
 
       user_agent
       cookie
@@ -58,7 +59,7 @@ module Apptokit
     attr_accessor :app_id, :webhook_secret, :installation_id
     attr_accessor :client_id, :client_secret, :oauth_callback_port, :oauth_callback_bind, :oauth_callback_path, :oauth_callback_hostname
     attr_accessor :personal_access_token
-    attr_accessor :manifest_url, :manifest
+    attr_accessor :manifest_url, :manifest, :app_owner
     attr_accessor :cookie
     attr_writer :user_agent, :accept_header
     attr_writer :private_key_path_glob, :keycache_file_path, :env, :user_keycache_expiry, :installation_keycache_expiry, :private_key
@@ -234,10 +235,11 @@ module Apptokit
     end
 
     def manifest_settings
-      @manifest_settings ||= ManifestApp::Settings.new(env, {
-        "manifest_url" => manifest_url,
-        "manifest"     => manifest
-      })
+      @manifest_settings ||= ManifestApp::Settings.new(
+        env,
+        {"manifest_url" => manifest_url, "manifest" => manifest },
+        app_owner
+      )
     end
 
     def realize_manifest?

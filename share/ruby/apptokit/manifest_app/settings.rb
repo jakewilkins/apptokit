@@ -12,10 +12,10 @@ module Apptokit
       new(gh_env, yaml_conf, *cli_opts).fetch
     end
 
-    attr_reader :gh_env,  :yaml_conf, :cli_opts, :app_settings
+    attr_reader :gh_env,  :yaml_conf, :cli_opts, :app_settings, :app_owner
 
-    def initialize(gh_env, yaml_conf, **cli_opts)
-      @gh_env, @yaml_conf, @cli_opts = gh_env, yaml_conf, cli_opts
+    def initialize(gh_env, yaml_conf, app_owner, **cli_opts)
+      @gh_env, @yaml_conf, @app_owner, @cli_opts = gh_env, yaml_conf, app_owner, cli_opts
       @app_settings = nil
       @loaded = false
       @manifest_app = nil
@@ -28,7 +28,11 @@ module Apptokit
       load_from_cache unless cli_opts[:skip_cache]
       return self if loaded?
 
-      opts = {env_name: gh_env, yaml_conf: yaml_conf}.merge(cli_opts)
+      opts = {
+        env_name: gh_env,
+        yaml_conf: yaml_conf,
+        app_owner: app_owner
+      }.merge(cli_opts)
       @manifest_app = ManifestApp.new(opts)
       settings = @manifest_app.create_app
       persist_to_cache(settings)

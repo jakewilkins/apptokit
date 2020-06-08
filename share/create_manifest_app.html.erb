@@ -26,7 +26,7 @@
   <body>
     <div id="outer">
       <div id="inner">
-        <form action="<%= Apptokit.config.github_url %>/settings/apps/new" method="post">
+        <form action="<%= manifest_flow_start_url %>" method="post">
           Create a GitHub App from the following manifest:
           <textarea name="manifest" id="manifest" value="<%= manifest_json %>" hidden></textarea>
           <br>
