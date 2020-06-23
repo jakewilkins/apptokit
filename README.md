@@ -24,7 +24,7 @@ See 'apptokit help <command>' for information on a specific command.
 `apptokit` ships with an installation script, [read it over][install-script-html].
 
 ```bash
-bash -c "$(curl https://raw.githubusercontent.com/jakewilkins/apptokit/master/install.sh -fsSL)" -- install
+bash -c "$(curl https://raw.githubusercontent.com/jakewilkins/apptokit/main/install.sh -fsSL)" -- install
 ```
 
 This will install `apptokit` into `/usr/local` and generate a comment-filled
