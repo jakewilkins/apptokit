@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 
 set -e
 
@@ -22,7 +23,7 @@ function install {
 
   command -v git >/dev/null 2>&1 || {
     echo >&2 "apptokit requires git, install it using Homebrew?"
-    read -p "Continue (y/n)?" choice
+    read -rp "Continue (y/n)?" choice
     case "$choice" in 
       y|Y )
         brew install git
@@ -49,7 +50,7 @@ function install {
   git checkout $TAG
 
   for move in "${LIB_MOVES[@]}"; do
-    mv -v $move $LIB_DIR/$move
+    mv -v "$move" "$LIB_DIR/$move"
   done
 
   popd
@@ -75,13 +76,14 @@ function install {
 }
 
 function uninstall {
+  shell_name=$(basename "$SHELL")
   echo "This uninstaller will remove"
   echo " - the lib files in /usr/local/lib"
   echo " - the linked executable in /usr/local/bin"
   echo " - any keycache files generated"
   echo
-  echo "Your global config and any project specific configs will remain, as well as shell-setup commands added to your $(basename $SHELL)rc"
-  echo "to fully complete uninstallation please remove the shell-setup commands from your $(basename $SHELL)rc"
+  echo "Your global config and any project specific configs will remain, as well as shell-setup commands added to your ${shell_name}rc"
+  echo "to fully complete uninstallation please remove the shell-setup commands from your ${shell_name}rc"
   echo
 
   
@@ -90,11 +92,11 @@ function uninstall {
   set +e
   db_glob="$(ls ~/.config/.apptokit_*_keycache.db 2>/dev/null)"
   set -e
-  [ ! -z "$db_glob" ] && { echo "removing key caches $db_glob"; rm $db_glob; }
+  [ -n "$db_glob" ] && { echo "removing key caches $db_glob"; rm "$db_glob"; }
   set +e
   db_glob="$(ls ~/.config/.apptokit_*_keycache 2>/dev/null)"
   set -e
-  [ ! -z "$db_glob" ] && { echo "removing key caches $db_glob"; rm $db_glob; }
+  [ -n "$db_glob" ] && { echo "removing key caches $db_glob"; rm "$db_glob"; }
   echo "uninstall complete."
 }
 
