@@ -1,11 +1,16 @@
-Style/StringLiterals:
-  Enabled: false 
 Layout/LineLength:
   Max: 150
+
 Metrics/MethodLength:
   Max: 30
+  Exclude:
+    - test/*
 Metrics/ClassLength:
   Max: 200
+Metrics/AbcSize:
+  Exclude:
+    - test/*
+
 Style/StderrPuts:
   Enabled: false 
 Style/PercentLiteralDelimiters:
@@ -14,9 +19,13 @@ Style/Documentation:
   Enabled: false
 Style/ParallelAssignment:
   Enabled: false
-  
+Style/StringLiterals:
+  Enabled: false
+
+
 AllCops:
   TargetRubyVersion: 2.7
   DisplayCopNames: true
   Exclude:
-    - "share/ruby/vendor/**/*"
+    - 'share/ruby/vendor/**/*'
+    - test/*
