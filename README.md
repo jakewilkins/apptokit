@@ -1,4 +1,4 @@
-## Apptokit
+# Apptokit
 
 Tools for GitHub App developers.
 
@@ -74,7 +74,7 @@ you can specify:
 To use `apptokit` for User-to-Server, you have to configure the User authorization
 callback URL to
 
-```
+```bash
 http://localhost:8075/callback
 ```
 
@@ -111,15 +111,15 @@ NOTE: this will open your browser unless there is an existing user token in the 
 ```bash
 $ apptokit curl user user/installations/15/repositories | jq
 {
-	"total_count": 1,
-		"repositories": [
-		{
-			"id": 534,
-			"name": "fictional-octo-funicular",
-			"full_name": "jakewilkins/fictional-octo-funicular",
+  "total_count": 1,
+    "repositories": [
+    {
+      "id": 534,
+      "name": "fictional-octo-funicular",
+      "full_name": "jakewilkins/fictional-octo-funicular",
       ... snip
-		}
-	]
+    }
+    ]
 }
 ```
 
