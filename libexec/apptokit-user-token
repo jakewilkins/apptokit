@@ -55,6 +55,11 @@ DummyToken = Struct.new(:token) do
   end
 end
 
+if options.has_key?(:"no-auto-open")
+  options.delete(:"no-auto-open")
+  options[:auto_open] = false
+end
+
 begin
   token = ENV["APPTOKIT_USER_TOKEN"] && DummyToken.new(ENV["APPTOKIT_USER_TOKEN"])
   token ||= if options.has_key?(:"refresh-token")
