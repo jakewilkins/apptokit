@@ -10,7 +10,7 @@ Style/StderrPuts:
   Enabled: false 
 Style/PercentLiteralDelimiters:
   Enabled: false  
-Style/Documentation
+Style/Documentation:
   Enabled: false
 Style/ParallelAssignment:
   Enabled: false
