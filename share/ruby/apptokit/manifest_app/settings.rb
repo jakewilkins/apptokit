@@ -77,8 +77,10 @@ module Apptokit
       end while !installation && count < 10
 
       unless installation
-        $stderr.puts "Unable to retrieve an installation id for #{yaml_manifest["name"] || generated_name}."
-        $stderr.puts "Please specify on manually in your apptokit.yml."
+        app_name = app_settings["name"] || generated_name
+        $stderr.puts "Unable to retrieve an installation id for #{app_name}."
+        $stderr.puts "Please install #{app_name} manually and update your apptokit.yml with the installation id."
+        exit 17
       end
 
       app_settings["installation_id"] = installation["id"]
