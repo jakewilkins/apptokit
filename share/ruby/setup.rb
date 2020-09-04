@@ -156,7 +156,7 @@ module Apptokit
     end
 
     def accept_header
-      @accept_header ||= "application/vnd.github.machine-man-preview+json, application/vnd.github.v3.text-match+json"
+      @accept_header ||= "application/vnd.github.v3.text-match+json"
     end
 
     def env_from_manifest?
