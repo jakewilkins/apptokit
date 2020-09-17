@@ -96,7 +96,7 @@ If you setup project specific YAML files you can specify a default env via a
 If you want to create an installation token (and you don't want to use `apptokit installation-token`)
 
 ```bash
-$ apptokit curl app post installations/15/access_tokens
+$ apptokit curl app post app/installations/15/access_tokens
 {
   "token": "v1.3f4e02159dd89notatokencb50f3a455b35e1",
   "expires_at": "2018-05-12T00:20:40Z"
