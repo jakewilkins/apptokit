@@ -27,12 +27,10 @@ module Apptokit
       if !ignore_expiry && DateTime.now > expiry
         drop(key)
         nil
+      elsif return_expiry
+        [value, expiry]
       else
-        if return_expiry
-          [value, expiry]
-        else
-          value
-        end
+        value
       end
     end
 

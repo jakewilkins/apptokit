@@ -7,15 +7,15 @@ require 'apptokit/callback_server'
 module Apptokit
   class UserToken
     def self.generate(auto_open: true, code: nil, force: false, user: nil)
-      new(auto_open: auto_open, code: code, skip_cache: force, user: user).tap { |t| t.generate }
+      new(auto_open: auto_open, code: code, skip_cache: force, user: user).tap(&:generate)
     end
 
     def self.refresh(token:)
-      new(refresh_token: token).tap { |t| t.refresh }
+      new(refresh_token: token).tap(&:refresh)
     end
 
     def self.get_code(auto_open: true, user: nil)
-      new(auto_open: auto_open, user: user).tap { |t| t.get_code }
+      new(auto_open: auto_open, user: user).tap(&:get_code)
     end
 
     attr_reader :auto_open, :installation_id, :mutex, :condition_variable, :skip_cache, :user, :oauth_code
@@ -202,12 +202,12 @@ module Apptokit
       end
 
       cache = Apptokit.keycache.get(cache_key) if cache == true
-      if cache
-        token, refresh_token = cache.split("-")
-        self.token = token
-        self.refresh_token = refresh_token
-        self.token_type = "Bearer"
-      end
+      return nil unless cache
+
+      token, refresh_token = cache.split("-")
+      self.token = token
+      self.refresh_token = refresh_token
+      self.token_type = "Bearer"
     end
 
     def cache_value

@@ -1,4 +1,6 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
+
 # Usage: apptokit env
 # Summary: Provide information about the currently configured GitHub App
 # Help:

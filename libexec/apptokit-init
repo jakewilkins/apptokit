@@ -1,4 +1,6 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
+
 # Usage: apptokit init <path|--global> [--env=env]
 # Summary: Generate a .apptokit.yml or add a new App environment
 # Help: This command will provide you with a starting point to use Apptokit,
@@ -56,8 +58,8 @@ if (env_index = ARGV.index { |arg| env_flags.include?(arg) })
   env = ARGV[env_index + 1]
   ARGV.delete_at(env_index)
   ARGV.delete_at(env_index + 1)
-else
-  env = ARGV.shift if ARGV.shift
+elsif ARGV.shift
+  env = ARGV.shift
 end
 
 dir = Pathname.new(dir)
@@ -98,7 +100,7 @@ if env
   env_template = Apptokit::Configuration::SHARE_DIR.join("apptokit-env-template.yml")
   if existing
     existing_conf = YAML.load_file(yaml_path)
-    if existing_conf.has_key?(env)
+    if existing_conf.key?(env)
       warn "WARNING: duplicate env '#{env}', this configuration will replace previously existing '#{env}' env when parsed by YAML."
     end
   end

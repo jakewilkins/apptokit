@@ -1,4 +1,6 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
+
 # Usage: apptokit user-token [--no-auto-open] [--force] [--code=<oauth code>] [--user=<user>]
 # Summary: Generate an User-Server token for a GitHub App installation.
 # Help: This command will attempt to auto generate a User authenticated token for a GitHub App.
@@ -55,16 +57,16 @@ DummyToken = Struct.new(:token) do
   end
 end
 
-if options.has_key?(:"no-auto-open")
+if options.key?(:"no-auto-open")
   options.delete(:"no-auto-open")
   options[:auto_open] = false
 end
 
 begin
   token = ENV["APPTOKIT_USER_TOKEN"] && DummyToken.new(ENV["APPTOKIT_USER_TOKEN"])
-  token ||= if options.has_key?(:"refresh-token")
+  token ||= if options.key?(:"refresh-token")
     Apptokit::UserToken.refresh(token: options[:"refresh-token"])
-  elsif options.has_key?(:"get-code")
+  elsif options.key?(:"get-code")
     Apptokit::UserToken.get_code(auto_open: options[:auto_open], user: options[:user])
   else
     Apptokit::UserToken.generate(options)

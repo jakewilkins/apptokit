@@ -8,14 +8,24 @@ Layout/FirstHashElementIndentation:
   EnforcedStyle: consistent
 
 Metrics/MethodLength:
-  Max: 30
+  Max: 31
   Exclude:
     - test/*
 Metrics/ClassLength:
   Max: 200
 Metrics/AbcSize:
+  Max: 39
   Exclude:
     - test/*
+Metrics/CyclomaticComplexity:
+  Max: 8
+Metrics/PerceivedComplexity:
+  Max: 8
+Metrics/ParameterLists:
+  Max: 6
+
+Naming/AccessorMethodName:
+  Enabled: false
 
 Style/StderrPuts:
   Enabled: false 

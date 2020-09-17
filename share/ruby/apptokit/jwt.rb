@@ -8,7 +8,7 @@ module Apptokit
     private :token=
 
     def self.generate(iat: nil, exp: nil, app_id: nil)
-      new(iat: iat, exp: exp, app_id: app_id).tap { |jwt| jwt.generate }
+      new(iat: iat, exp: exp, app_id: app_id).tap(&:generate)
     end
 
     def initialize(iat: nil, exp: nil, app_id: nil)

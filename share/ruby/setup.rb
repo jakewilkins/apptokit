@@ -137,11 +137,11 @@ module Apptokit
     end
 
     def user_keycache_expiry
-      @default_keycache_expiry ||= 5 * 24 * 60 * 60
+      @user_keycache_expiry ||= 5 * 24 * 60 * 60
     end
 
     def installation_keycache_expiry
-      @default_keycache_expiry ||= 9 * 60
+      @installation_keycache_expiry ||= 9 * 60
     end
 
     def keycache_file_path
@@ -184,15 +184,15 @@ module Apptokit
     def set_opts_from_yaml(path)
       return unless path.exist?
 
-      yaml = YAML.load(path.read)
+      yaml = YAML.safe_load(path.read)
       set_opts_from_hash(yaml)
 
       @env = yaml["default_env"] unless env
 
-      if env
-        env_overrides = yaml[env]
-        set_opts_from_hash(env_overrides) if env_overrides
-      end
+      return unless env
+
+      env_overrides = yaml[env]
+      set_opts_from_hash(env_overrides) if env_overrides
     end
 
     def set_opts_from_env
@@ -220,13 +220,13 @@ module Apptokit
         end
       end
 
-      if installation_id.nil? && !installing_app?
-        manifest_settings.install_app
+      return unless installation_id.nil? && !installing_app?
 
-        self.class.loading_manifest do
-          manifest_settings.apply(Apptokit.config)
-          manifest_settings.apply(self)
-        end
+      manifest_settings.install_app
+
+      self.class.loading_manifest do
+        manifest_settings.apply(Apptokit.config)
+        manifest_settings.apply(self)
       end
     end
 
@@ -239,15 +239,15 @@ module Apptokit
     end
 
     def realize_manifest?
-      !ENV.has_key?("LIMITED_MANIFEST")
+      !ENV.key?("LIMITED_MANIFEST")
     end
 
     def installing_app?
-      ENV.has_key?("INSTALLING_APP")
+      ENV.key?("INSTALLING_APP")
     end
 
     def debug?
-      ENV.has_key?("DEBUG")
+      ENV.key?("DEBUG")
     end
   end
 

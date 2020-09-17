@@ -9,7 +9,7 @@ require "apptokit/key_cache"
 module Apptokit
   class InstallationToken
     def self.generate(installation_id: nil, skip_cache: false)
-      new(installation_id: installation_id, skip_cache: skip_cache).tap { |t| t.generate }
+      new(installation_id: installation_id, skip_cache: skip_cache).tap(&:generate)
     end
 
     attr_reader :installation_id, :token, :expires_at, :skip_cache, :cached

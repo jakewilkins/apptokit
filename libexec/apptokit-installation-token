@@ -1,4 +1,6 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
+
 # Usage: apptokit installation-token [--force]
 # Summary: Generate an installation token for a GitHub App installation.
 # Help: Generates an installation token for your app
