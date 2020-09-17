@@ -86,7 +86,8 @@ unable to change the authorize callback URL for the GitHub App you're configurin
 
 ### Changing environments
 
-`apptokit` uses the ENV variables `APPTOKIT_ENV` & `GH_ENV` to pick the environment.
+`apptokit` uses either `APPTOKIT_ENV` or `GH_ENV` to pick which GitHub App environment to use.
+The two are equivalent in function, I just got tired of typing out APPTOKIT_ENV.
 
 If you setup project specific YAML files you can specify a default env via a
 `default_env` key.
