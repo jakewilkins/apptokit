@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 require 'net/http'
-require 'thread'
-
 require 'erb'
 require 'tempfile'
 
@@ -78,28 +76,28 @@ module Apptokit
 
     def exchange_code_for_app_settings
       uri = URI("#{Apptokit.config.github_api_url}/app-manifests/#{code}/conversions")
-      res = Net::HTTP.post(uri, "", {"Accept" => "application/vnd.github.fury-preview+json"})
+      res = Net::HTTP.post(uri, "", { "Accept" => "application/vnd.github.fury-preview+json" })
 
       case res
       when Net::HTTPSuccess
         JSON.parse(res.body)
       else
-        raise ApptokitError.new("Failed to exchange GitHub App Manifest code for App credentials: #{res.code}\n\n#{res.body}")
+        raise ApptokitError, "Failed to exchange GitHub App Manifest code for App credentials: #{res.code}\n\n#{res.body}"
       end
     end
 
     def manifest_json
       JSON.pretty_generate({
-        name: yaml_manifest["name"] || generated_name,
-        url: yaml_manifest["url"] || "http://example.com",
-        hook_attributes: yaml_manifest["hook_attributes"] || {url: "http://example.com/webhooks"},
-        callback_url: yaml_manifest["callback_url"] || "http://localhost:8075/callback",
-        redirect_url: callback_server_url,
-        description: yaml_manifest["description"] || "An Apptokit Managed GitHub App",
-        public: yaml_manifest["public"] || false,
-        default_events: yaml_manifest["events"],
-        default_permissions: yaml_manifest["permissions"]
-      })
+                             name: yaml_manifest["name"] || generated_name,
+                             url: yaml_manifest["url"] || "http://example.com",
+                             hook_attributes: yaml_manifest["hook_attributes"] || { url: "http://example.com/webhooks" },
+                             callback_url: yaml_manifest["callback_url"] || "http://localhost:8075/callback",
+                             redirect_url: callback_server_url,
+                             description: yaml_manifest["description"] || "An Apptokit Managed GitHub App",
+                             public: yaml_manifest["public"] || false,
+                             default_events: yaml_manifest["events"],
+                             default_permissions: yaml_manifest["permissions"]
+                           })
     end
 
     def generated_name
@@ -111,9 +109,7 @@ module Apptokit
     end
 
     def yaml_manifest
-      if yaml_conf["manifest_url"]
-        yaml_conf["manifest"] = fetch_manifest_from_url
-      end
+      yaml_conf["manifest"] = fetch_manifest_from_url if yaml_conf["manifest_url"]
       yaml_conf["manifest"]
     end
 
@@ -129,7 +125,7 @@ module Apptokit
       when Net::HTTPSuccess
         JSON.parse(res.body)
       else
-        $stderr.puts "Could not fetch an App Manifest from #{yaml_conf["manifest_url"]}"
+        $stderr.puts "Could not fetch an App Manifest from #{yaml_conf['manifest_url']}"
         exit 20
       end
     end

@@ -8,7 +8,7 @@ module Apptokit
     private :token=
 
     def self.generate(iat: nil, exp: nil, app_id: nil)
-      new(iat: iat, exp: exp, app_id: app_id).tap {|jwt| jwt.generate}
+      new(iat: iat, exp: exp, app_id: app_id).tap { |jwt| jwt.generate }
     end
 
     def initialize(iat: nil, exp: nil, app_id: nil)
@@ -39,7 +39,7 @@ module Apptokit
     end
 
     def app_id
-      @app_id ||= Apptokit.config.app_id || raise(ApptokitError.new("Generating a JWT requires an App ID."))
+      @app_id ||= Apptokit.config.app_id || raise(ApptokitError, "Generating a JWT requires an App ID.")
     end
 
     def private_key

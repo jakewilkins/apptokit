@@ -92,7 +92,7 @@ module Apptokit
 
       @killed = false
 
-      block.call(self) unless block.nil?
+      block&.call(self)
     end
 
     def callback_url
@@ -102,6 +102,7 @@ module Apptokit
 
     def oauth_code
       return nil if request.nil?
+
       @oauth_code ||= Hash[URI.decode_www_form(request.query_string)]["code"]
     end
     alias code oauth_code
@@ -112,7 +113,7 @@ module Apptokit
       log_file = File.open('/dev/null', 'a+')
       log = WEBrick::Log.new(log_file)
       access_log = [
-        [log_file, WEBrick::AccessLog::COMBINED_LOG_FORMAT],
+        [log_file, WEBrick::AccessLog::COMBINED_LOG_FORMAT]
       ]
 
       @server = WEBrick::HTTPServer.new(
@@ -159,4 +160,3 @@ module Apptokit
     end
   end
 end
-

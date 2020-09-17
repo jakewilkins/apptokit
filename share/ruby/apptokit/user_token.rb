@@ -1,23 +1,21 @@
 # frozen_string_literal: true
 
 require 'net/http'
-require 'thread'
-
 require 'apptokit/key_cache'
 require 'apptokit/callback_server'
 
 module Apptokit
   class UserToken
     def self.generate(auto_open: true, code: nil, force: false, user: nil)
-      new(auto_open: auto_open, code: code, skip_cache: force, user: user).tap {|t| t.generate}
+      new(auto_open: auto_open, code: code, skip_cache: force, user: user).tap { |t| t.generate }
     end
 
     def self.refresh(token:)
-      new(refresh_token: token).tap {|t| t.refresh}
+      new(refresh_token: token).tap { |t| t.refresh }
     end
 
     def self.get_code(auto_open: true, user: nil)
-      new(auto_open: auto_open, user: user).tap {|t| t.get_code}
+      new(auto_open: auto_open, user: user).tap { |t| t.get_code }
     end
 
     attr_reader :auto_open, :installation_id, :mutex, :condition_variable, :skip_cache, :user, :oauth_code
@@ -54,15 +52,13 @@ module Apptokit
         cache_value
       end
 
-      if self.cached
-        load_from(cache: token)
-      end
+      load_from(cache: token) if cached
 
       self
     end
 
     def refresh
-      self.refresh_token || load_from(cache: true)
+      refresh_token || load_from(cache: true)
 
       token_info = exchange_code_for_token(refresh_token, refresh: true)
       load_from(response: token_info)
@@ -134,14 +130,14 @@ module Apptokit
         puts "bye!"
         exit!
       ensure
-        callback_server.shutdown rescue nil
+        begin
+          callback_server.shutdown
+        rescue StandardError
+          nil
+        end
       end
 
-      unless callback_server.oauth_code
-        raise ApptokitError.new(
-          "Failed to get an OAuth Code from GitHub, did you visit the URL in your browser?"
-        )
-      end
+      raise ApptokitError, "Failed to get an OAuth Code from GitHub, did you visit the URL in your browser?" unless callback_server.oauth_code
 
       @oauth_code = callback_server.oauth_code
     end
@@ -159,7 +155,7 @@ module Apptokit
 
       headers = {
         "Content-Type" => "application/x-www-form-urlencoded",
-        "User-Agent"   => user_agent,
+        "User-Agent" => user_agent
       }
       headers["Cookie"] = cookie if cookie
 
@@ -172,11 +168,11 @@ module Apptokit
         Apptokit.config.debug do
           p headers
           p uri, body
-          puts "Redirected to #{res["Location"]}"
+          puts "Redirected to #{res['Location']}"
         end
-        raise ApptokitError.new("Redirected during token create, possibly a cookie issue? Location: #{res["Location"]}")
+        raise ApptokitError, "Redirected during token create, possibly a cookie issue? Location: #{res['Location']}"
       else
-        raise ApptokitError.new("Failed to exchange OAuth code for token: #{res.code}\n\n#{res.body}")
+        raise ApptokitError, "Failed to exchange OAuth code for token: #{res.code}\n\n#{res.body}"
       end
     end
 
@@ -192,9 +188,7 @@ module Apptokit
       missing << "client_id" unless client_id
       missing << "client_secret" unless client_secret
 
-      unless missing.empty?
-        raise ApptokitError.new("Cannot create a User Token without: #{missing.join(", ")}.")
-      end
+      raise ApptokitError, "Cannot create a User Token without: #{missing.join(', ')}." unless missing.empty?
     end
 
     def load_from(response: nil, cache: nil)

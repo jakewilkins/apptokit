@@ -51,7 +51,7 @@ module Apptokit
       user_agent
       cookie
       accept_header
-    )
+    ).freeze
 
     DEFAULT_GITHUB_URL     = URI("https://github.com")
     DEFAULT_GITHUB_API_URL = URI("https://api.github.com")
@@ -67,9 +67,7 @@ module Apptokit
     def self.environments
       envs = []
       [HOME_DIR_CONF_PATH, PROJECT_DIR_CONF_PATH].each do |path|
-        if path.exist?
-          envs += (YAML.load_file(path).keys - YAML_OPTS)
-        end
+        envs += (YAML.load_file(path).keys - YAML_OPTS) if path.exist?
       end
       (envs - %w(default_env)).reject { |e| /_defaults/.match?(e) }
     end
@@ -98,9 +96,8 @@ module Apptokit
 
     def private_key
       @private_key ||= begin
-        unless private_key_path && !private_key_path.to_s.empty?
-          raise ApptokitError.new("Private key path not set but required for using a private key.")
-        end
+        raise ApptokitError, "Private key path not set but required for using a private key." unless private_key_path && !private_key_path.to_s.empty?
+
         OpenSSL::PKey::RSA.new(File.read(private_key_path))
       end
     end
@@ -110,7 +107,7 @@ module Apptokit
     end
 
     def private_key_path
-      @private_key_path ||= Dir[private_key_path_glob].sort.last
+      @private_key_path ||= Dir[private_key_path_glob].max
     end
 
     def private_key_path_glob
@@ -148,7 +145,7 @@ module Apptokit
     end
 
     def keycache_file_path
-      @keycache_file_path ||= HOME_DIR_CONF_DIR.join(".apptokit_#{env || "global"}_keycache")
+      @keycache_file_path ||= HOME_DIR_CONF_DIR.join(".apptokit_#{env || 'global'}_keycache")
     end
 
     def user_agent
@@ -208,7 +205,6 @@ module Apptokit
       return if self.class.loading_manifest
       return unless env_from_manifest?
 
-
       if !manifest_settings.loaded? && realize_manifest?
         self.class.loading_manifest do
           manifest_settings.fetch
@@ -237,7 +233,7 @@ module Apptokit
     def manifest_settings
       @manifest_settings ||= ManifestApp::Settings.new(
         env,
-        {"manifest_url" => manifest_url, "manifest" => manifest },
+        { "manifest_url" => manifest_url, "manifest" => manifest },
         app_owner
       )
     end
@@ -269,4 +265,3 @@ module Apptokit
 end
 
 require 'apptokit/manifest_app/settings'
-

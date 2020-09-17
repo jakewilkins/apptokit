@@ -9,7 +9,7 @@ require "apptokit/key_cache"
 module Apptokit
   class InstallationToken
     def self.generate(installation_id: nil, skip_cache: false)
-      new(installation_id: installation_id, skip_cache: skip_cache).tap {|t| t.generate}
+      new(installation_id: installation_id, skip_cache: skip_cache).tap { |t| t.generate }
     end
 
     attr_reader :installation_id, :token, :expires_at, :skip_cache, :cached
@@ -38,7 +38,7 @@ module Apptokit
       token, expiry = Apptokit.keycache.get_set(cache_key, :installation, return_expiry: true) do
         self.cached = false
         perform_generation
-        [self.token, self.expires_at]
+        [self.token, expires_at]
       end
 
       if cached
@@ -52,11 +52,7 @@ module Apptokit
     def perform_generation
       uri = URI(installation_token_url)
       request = Net::HTTP::Post.new(uri)
-      if ENV["USER_AGENT"]
-        request["User-Agent"] = ENV["USER_AGENT"]
-      else
-        request["User-Agent"] = "Apptokit"
-      end
+      request["User-Agent"] = (ENV["USER_AGENT"] || "Apptokit")
       request["Accept"] = "application/vnd.github.machine-man-preview+json"
       request["Authorization"] = jwt.header
 
@@ -69,7 +65,7 @@ module Apptokit
         hash = JSON.parse(response.body)
         self.token      = hash["token"]
         self.expires_at = hash["expires_at"]
-      when Net::HTTPNotFound then
+      when Net::HTTPNotFound
         if Apptokit.config.env_from_manifest?
           Apptokit.config.clear_manifest_cache!
           $stderr.puts "The cached manifest information is no longer valid, we removed it."
@@ -80,7 +76,7 @@ module Apptokit
           exit 15
         end
       else
-        raise ApptokitError.new("Could not create an Installation Token: #{response.code}\n\n#{response.body}")
+        raise ApptokitError, "Could not create an Installation Token: #{response.code}\n\n#{response.body}"
       end
       self
     end

@@ -26,7 +26,7 @@ require "setup"
 require "apptokit/user_token"
 require 'optparse'
 
-options = {force: false, auto_open: true, user: nil, code: nil}
+options = { force: false, auto_open: true, user: nil, code: nil }
 OptionParser.new do |opts|
   opts.on("-f", "--force", "Don't use a cached token")
 
@@ -63,14 +63,14 @@ end
 begin
   token = ENV["APPTOKIT_USER_TOKEN"] && DummyToken.new(ENV["APPTOKIT_USER_TOKEN"])
   token ||= if options.has_key?(:"refresh-token")
-    Apptokit::UserToken.refresh(token: options[:"refresh-token"])
-  elsif options.has_key?(:"get-code")
-    Apptokit::UserToken.get_code(auto_open: options[:auto_open], user: options[:user])
-  else
-    Apptokit::UserToken.generate(options)
+              Apptokit::UserToken.refresh(token: options[:"refresh-token"])
+            elsif options.has_key?(:"get-code")
+              Apptokit::UserToken.get_code(auto_open: options[:auto_open], user: options[:user])
+            else
+              Apptokit::UserToken.generate(options)
   end
-rescue Apptokit::ApptokitError => boom
-  $stderr.puts boom.message
+rescue Apptokit::ApptokitError => e
+  $stderr.puts e.message
   exit 5
 end
 

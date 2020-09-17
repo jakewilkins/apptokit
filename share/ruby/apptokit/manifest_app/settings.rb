@@ -12,7 +12,7 @@ module Apptokit
       new(gh_env, yaml_conf, *cli_opts).fetch
     end
 
-    attr_reader :gh_env,  :yaml_conf, :cli_opts, :app_settings, :app_owner
+    attr_reader :gh_env, :yaml_conf, :cli_opts, :app_settings, :app_owner
 
     def initialize(gh_env, yaml_conf, app_owner, **cli_opts)
       @gh_env, @yaml_conf, @app_owner, @cli_opts = gh_env, yaml_conf, app_owner, cli_opts
@@ -48,9 +48,7 @@ module Apptokit
       conf.client_secret  = app_settings["client_secret"]
       conf.webhook_secret = app_settings["webhook_secret"]
 
-      unless conf.installation_id
-        conf.installation_id = app_settings["installation_id"]
-      end
+      conf.installation_id = app_settings["installation_id"] unless conf.installation_id
 
       conf
     end
@@ -61,7 +59,7 @@ module Apptokit
 
       ENV["INSTALLING_APP"] = "true"
 
-      install_url = "#{app_settings["html_url"]}/installations/new"
+      install_url = "#{app_settings['html_url']}/installations/new"
       `$BROWSER #{install_url}`
 
       sleep 2
@@ -89,6 +87,7 @@ module Apptokit
 
     def load_from_cache
       return unless cache_path.exist?
+
       @app_settings = JSON.parse(Base64.decode64(File.read(cache_path)))
       @loaded = true
     end

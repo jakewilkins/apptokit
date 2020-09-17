@@ -71,7 +71,7 @@ if $stdout.isatty
       url = env.github_url == Apptokit::Configuration::DEFAULT_GITHUB_URL ? nil : env.github_url
       api_url = env.github_api_url == Apptokit::Configuration::DEFAULT_GITHUB_API_URL ? nil : env.github_api_url
       urls = [url, api_url].compact
-      urls = urls.any? ? " (#{urls.join(", ")})" : ""
+      urls = urls.any? ? " (#{urls.join(', ')})" : ""
       puts " - #{env.env}#{urls}"
     end
   elsif show_envs.any?
@@ -97,4 +97,3 @@ else
     print values(Apptokit.config).to_json
   end
 end
-
