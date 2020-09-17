@@ -61,10 +61,10 @@ begin
       valid_signature = validate_hook_signature(headers, payload) if Apptokit.config.webhook_secret
 
       hash = begin
-               JSON.parse(payload)
-             rescue StandardError
-               "Not valid JSON"
-             end
+        JSON.parse(payload)
+      rescue StandardError # rubocop:disable Layout/RescueEnsureAlignment
+        "Not valid JSON"
+      end
 
       puts "Received hook:"
       puts headers.join
