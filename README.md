@@ -74,5 +74,5 @@ From here, check out some:
 
 
 [install-script-html]: https://github.com/jakewilkins/apptokit/blob/main/install.sh
-[configuration]: https://github.com/jakewilkins/apptokit/docs/configuration.md
-[examples]: https://github.com/jakewilkins/apptokit/docs/examples.md
+[configuration]: https://github.com/jakewilkins/apptokit/blob/main/docs/configuration.md
+[examples]: https://github.com/jakewilkins/apptokit/blob/main/docs/examples.md
