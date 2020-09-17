@@ -38,15 +38,15 @@ show_help("For init you must specify either a path or --global") if ARGV.empty?
 filename = ".apptokit.yml"
 global_flag = %w(--global -g)
 dir = if (global_index = ARGV.index { |a| global_flag.include?(a) })
-        filename = "apptokit.yml"
-        ARGV.delete_at(global_index)
-        puts "here!"
-        Pathname.new(ENV["HOME"]).join(".config")
-      elsif ARGV[0] == "."
-        ARGV.shift
-        Dir.pwd
-      else
-        ARGV.shift
+  filename = "apptokit.yml"
+  ARGV.delete_at(global_index)
+  puts "here!"
+  Pathname.new(ENV["HOME"]).join(".config")
+elsif ARGV[0] == "."
+  ARGV.shift
+  Dir.pwd
+else
+  ARGV.shift
 end
 
 puts "dir = #{dir}"

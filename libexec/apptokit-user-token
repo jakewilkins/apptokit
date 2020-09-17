@@ -63,11 +63,11 @@ end
 begin
   token = ENV["APPTOKIT_USER_TOKEN"] && DummyToken.new(ENV["APPTOKIT_USER_TOKEN"])
   token ||= if options.has_key?(:"refresh-token")
-              Apptokit::UserToken.refresh(token: options[:"refresh-token"])
-            elsif options.has_key?(:"get-code")
-              Apptokit::UserToken.get_code(auto_open: options[:auto_open], user: options[:user])
-            else
-              Apptokit::UserToken.generate(options)
+    Apptokit::UserToken.refresh(token: options[:"refresh-token"])
+  elsif options.has_key?(:"get-code")
+    Apptokit::UserToken.get_code(auto_open: options[:auto_open], user: options[:user])
+  else
+    Apptokit::UserToken.generate(options)
   end
 rescue Apptokit::ApptokitError => e
   $stderr.puts e.message

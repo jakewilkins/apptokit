@@ -82,16 +82,16 @@ module Apptokit
 
     def format_expiration(expiry, iso8601: true)
       expiry = case expiry
-               when String
-                 DateTime.iso8601(expiry)
-               when Numeric
-                 Time.now + expiry
-               when DateTime, Time, Date
-                 expiry.to_datetime
-               when :user
-                 format_expiration(Apptokit.config.user_keycache_expiry, iso8601: false)
-               when :installation
-                 format_expiration(Apptokit.config.installation_keycache_expiry, iso8601: false)
+      when String
+        DateTime.iso8601(expiry)
+      when Numeric
+        Time.now + expiry
+      when DateTime, Time, Date
+        expiry.to_datetime
+      when :user
+        format_expiration(Apptokit.config.user_keycache_expiry, iso8601: false)
+      when :installation
+        format_expiration(Apptokit.config.installation_keycache_expiry, iso8601: false)
       end
       iso8601 ? expiry.iso8601 : expiry
     end

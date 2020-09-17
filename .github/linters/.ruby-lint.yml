@@ -1,5 +1,11 @@
 Layout/LineLength:
   Max: 150
+Layout/CaseIndentation:
+  EnforcedStyle: end
+Layout/EndAlignment:
+  EnforcedStyleAlignWith: variable
+Layout/FirstHashElementIndentation:
+  EnforcedStyle: consistent
 
 Metrics/MethodLength:
   Max: 30
