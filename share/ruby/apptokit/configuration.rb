@@ -80,9 +80,14 @@ module Apptokit
       end
 
       YAML_OPTS.each do |attr|
-        if value = config_loader.fetch(attr)
+        value = config_loader.fetch(attr)
+        if value
           send(:"#{attr}=", value)
         end
+      end
+
+      if pem = config_loader.fetch("private_key")
+        @private_key = pem
       end
     end
 
