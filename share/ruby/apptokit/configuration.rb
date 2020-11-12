@@ -145,6 +145,10 @@ module Apptokit
       @accept_header ||= "application/vnd.github.v3.text-match+json"
     end
 
+    def keycache_file_path
+      @keycache_file_path ||= ConfigLoader::HOME_DIR_CONF_DIR.join(".apptokit_#{env || 'global'}_keycache")
+    end
+
     def debug(msg = nil, &block)
       return unless debug?
       return block.call if block

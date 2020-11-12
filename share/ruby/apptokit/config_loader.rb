@@ -65,10 +65,6 @@ module Apptokit
       config['env'] ||= ENV["APPTOKIT_ENV"] || ENV["GH_ENV"]
     end
 
-    def keycache_file_path
-      config['keycache_file_path'] ||= HOME_DIR_CONF_DIR.join(".apptokit_#{env || 'global'}_keycache")
-    end
-
     def env_from_manifest?
       config['manifest_url'].present? || !manifest_data.nil?
     end
