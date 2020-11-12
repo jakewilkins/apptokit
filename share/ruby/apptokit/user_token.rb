@@ -118,11 +118,10 @@ module Apptokit
       callback_server = CallbackServer.new(mutex, condition_variable)
       callback_server.start
 
-      if auto_open
-        `$BROWSER '#{oauth_url(callback_server.callback_url)}'`
-      else
-        puts "Please open the link below to continue authorizing application:\n\n  #{oauth_url(callback_server.callback_url)}\n\n"
-      end
+      Apptokit.open(
+        oauth_url(callback_server.callback_url),
+        prompt:  "Please open the link below to continue authorizing application:"
+      )
 
       begin
         mutex.synchronize { condition_variable.wait(mutex, 60) }
