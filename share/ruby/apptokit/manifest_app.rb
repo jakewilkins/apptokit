@@ -3,6 +3,7 @@
 require 'base64'
 require 'json'
 require 'apptokit/manifest_app/creator'
+require 'apptokit/manifest_app/installer'
 
 module Apptokit
   module ManifestApp
@@ -26,42 +27,42 @@ module Apptokit
 
       persist_to_cache(conf_loader.env, settings)
 
-      load_from_cache(conf_loader, cli_opts)
+      load_from_cache(conf_loader)
     end
 
     def install(conf_loader, cli_opts, manifest_response = nil)
       manifest_response ||= read_from_cache(conf_loader.env)
 
+      return manifest_response['installation_id'] if manifest_response['installation_id']
+
       installation_id = ManifestApp::Installer.call(
         url: manifest_response['html_url'],
         name: manifest_response['name'],
-        cli_opts: cli_opts
+        conf_loader: conf_loader
       )
 
       manifest_response['installation_id'] = installation_id
       persist_to_cache(conf_loader.env, manifest_response)
 
-      load_from_cache(conf, cli_opts)
+      opts, _ = load_from_cache(conf_loader)
+      opts['installation_id']
     end
 
-    def delete_cache(conf_loader)
-      path = cache_path(conf_loader.env)
-      return unless path.exist?
-
-      FileUtils.rm(path)
+    def delete_cache(config_loader)
+      ensure_cache_dir_exists!
+      path = cache_path(config_loader.env)
+      FileUtils.rm(path) if path.exist?
     end
-
-    # private
 
     def convert_to_apptokit_opts(raw_manifest)
       hash = {
-        app_id:         raw_manifest["id"],
-        client_id:      raw_manifest["client_id"],
-        private_key:    OpenSSL::PKey::RSA.new(raw_manifest["pem"]),
-        client_secret:  raw_manifest["client_secret"],
-        webhook_secret: raw_manifest["webhook_secret"],
+        "app_id"         => raw_manifest["id"],
+        "client_id"      => raw_manifest["client_id"],
+        "private_key"    => OpenSSL::PKey::RSA.new(raw_manifest["pem"]),
+        "client_secret"  => raw_manifest["client_secret"],
+        "webhook_secret" => raw_manifest["webhook_secret"],
       }
-      hash[:installation_id] = raw_manifest["installation_id"]
+      hash["installation_id"] = raw_manifest["installation_id"] if raw_manifest["installation_id"]
 
       hash
     end
@@ -73,11 +74,6 @@ module Apptokit
     def persist_to_cache(env, settings)
       ensure_cache_dir_exists!
       File.write(cache_path(env), Base64.encode64(JSON.generate(settings)))
-    end
-
-    def delete_cache(env)
-      ensure_cache_dir_exists!
-      FileUtils.rm(cache_path(env)) if cache_path.exist?
     end
 
     def cache_path(env)

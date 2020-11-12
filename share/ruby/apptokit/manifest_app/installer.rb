@@ -5,7 +5,7 @@ module Apptokit
     module Installer
       module_function
 
-      def call(url:, name:)
+      def call(url:, name:, conf_loader:)
         return if skip_app_installation?
 
         ENV["INSTALLING_APP"] = "true"
@@ -15,16 +15,22 @@ module Apptokit
 
         sleep 2
 
-        installation, token = nil
+        installation = nil
         count = 0
+
+        Apptokit.config = Apptokit::Configuration.new(conf_loader.env, conf_loader)
+        token = get_token(conf_loader)
+        installation_uri = URI("#{Apptokit.config.github_api_url}/app/installations")
+
         loop do
           count += 1
-          installations, token = get_installations(token)
+          installations = get_installations(token, installation_uri)
 
           installation = installations.first
           sleep 2 unless installation
 
-          break if !installation && count < 10
+          break if installation
+          break if count > 10
         end
 
         unless installation
@@ -37,13 +43,11 @@ module Apptokit
         installation["id"]
       end
 
-      def get_installations(token = nil)
-        token ||= Apptokit::JWT.new.header
-        uri = URI("#{Apptokit.config.github_api_url}/app/installations")
+      def get_installations(token, uri)
         # puts "fetching installations #{uri}"
         response = Net::HTTP.start(uri.host, uri.port, use_ssl: uri.scheme == "https") do |http|
           req = Net::HTTP::Get.new(uri)
-          req["Accept"] = "application/vnd.github.machine-man-preview+json"
+          req["User-Agent"] = Apptokit.config.user_agent
           req["Authorization"] = token
 
           http.request(req)
@@ -53,12 +57,16 @@ module Apptokit
         when Net::HTTPSuccess
           parsed = JSON.parse(response.body)
 
-          [parsed, token]
+          parsed
         else
           sleep 0.1
 
-          [[], token]
+          []
         end
+      end
+
+      def get_token(conf_loader)
+        Apptokit::JWT.new.header
       end
 
       def skip_app_installation?
