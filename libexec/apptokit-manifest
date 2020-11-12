@@ -52,10 +52,11 @@ when "create"
     $stderr.puts boom.message
     exit 6
   end
-  puts "Manifest App created for #{config.env}"
+  puts "Manifest App created for #{config_loader.env}"
   pp manifest
 when "install"
-  Apptokit::ManifestApp.install(config_loader, {})
+  installation_id = Apptokit::ManifestApp.install(config_loader, {})
+  puts "#{config_loader.env} installed, installation id: #{installation_id}"
 when "show"
   puts "Manifest for env: #{config_loader.env}"
   unless manifest.nil?
