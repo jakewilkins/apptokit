@@ -61,14 +61,14 @@ end
 
 edit_envs = (%w(--edit -e) & ARGV).any?
 list_envs = (%w(--list -l list) & ARGV).any?
-show_envs = ARGV & Apptokit::Configuration.environments
+show_envs = ARGV & Apptokit::ConfigLoader.environments
 
 if $stdout.isatty
   if edit_envs
-    Kernel.exec(ENV["EDITOR"], Apptokit::Configuration::HOME_DIR_CONF_PATH.to_s)
+    Kernel.exec(ENV["EDITOR"], Apptokit::ConfigLoader::HOME_DIR_CONF_PATH.to_s)
   elsif list_envs
     puts "Apptokit knows about these environments:"
-    Apptokit::Configuration.environments.each do |env|
+    Apptokit::ConfigLoader.environments.each do |env|
       env = Apptokit::Configuration.new(env)
       url = env.github_url == Apptokit::Configuration::DEFAULT_GITHUB_URL ? nil : env.github_url
       api_url = env.github_api_url == Apptokit::Configuration::DEFAULT_GITHUB_API_URL ? nil : env.github_api_url
