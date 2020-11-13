@@ -55,10 +55,15 @@ module Apptokit
     end
 
     def convert_to_apptokit_opts(raw_manifest)
+      key = begin
+        OpenSSL::PKey::RSA.new(raw_manifest["pem"])
+      rescue OpenSSL::PKey::RSAError
+        :unavailable
+      end
       hash = {
         "app_id"         => raw_manifest["id"],
         "client_id"      => raw_manifest["client_id"],
-        "private_key"    => OpenSSL::PKey::RSA.new(raw_manifest["pem"]),
+        "private_key"    => key,
         "client_secret"  => raw_manifest["client_secret"],
         "webhook_secret" => raw_manifest["webhook_secret"],
       }
