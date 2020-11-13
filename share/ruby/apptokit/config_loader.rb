@@ -29,11 +29,14 @@ module Apptokit
       end
     end
 
+    def self.load!
+      new.tap(&:load!)
+    end
+
     attr_reader :config, :manifest_data
     private :config
 
-    def initialize(env = nil)
-      @env = env
+    def initialize
       @config = {}
     end
 
@@ -46,6 +49,11 @@ module Apptokit
       set_opts_from_yaml(PROJECT_DIR_CONF_PATH)
       set_opts_from_cached_manifest
       set_opts_from_env
+    end
+
+    def reload!
+      @config = {}
+      load!
     end
 
     def fetch(var, default = nil, &block)
@@ -62,7 +70,7 @@ module Apptokit
     end
 
     def env
-      config['env'] ||= ENV["APPTOKIT_ENV"] || ENV["GH_ENV"]
+      @env ||= ENV["APPTOKIT_ENV"] || ENV["GH_ENV"] || config['default_env']
     end
 
     def env_from_manifest?
@@ -129,14 +137,6 @@ module Apptokit
 
     def realize_manifest?
       !ENV.key?("LIMITED_MANIFEST")
-    end
-
-    def installing_app?
-      ENV.key?("INSTALLING_APP")
-    end
-
-    def debug?
-      ENV.key?("DEBUG")
     end
   end
 end
