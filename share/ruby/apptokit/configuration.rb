@@ -86,6 +86,8 @@ module Apptokit
         end
       end
 
+      @env = config_loader.env
+
       if pem = config_loader.fetch("private_key")
         @private_key = pem
       end
