@@ -1,9 +1,4 @@
 
-export TEST_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-export TMP_DIR="$(dirname "$TEST_DIR")/tmp"
-export HOME="$TMP_DIR/bats"
-
-mkdir -p $HOME
 
 mkdir -p ~/.config/apptokit
 
