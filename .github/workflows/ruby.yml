@@ -16,7 +16,7 @@ jobs:
     - name: Set up Ruby ${{ matrix.ruby }}
       uses: actions/setup-ruby@v1
       with:
-        version: ${{ matrix.ruby }}
+        ruby-version: ${{ matrix.ruby }}
         architecture: 'x64'
     - name: Run tests
       env:
