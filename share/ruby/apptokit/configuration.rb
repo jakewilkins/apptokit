@@ -62,9 +62,6 @@ module Apptokit
     DEFAULT_GITHUB_API_URL = URI("https://api.github.com")
 
     attr_reader :env
-    attr_reader(*YAML_OPTS)
-    attr_writer(*YAML_OPTS)
-    private(*YAML_OPTS.map { |s| "#{s}=".intern })
 
     def initialize(env = nil, loader = nil)
       @env = env
@@ -163,6 +160,13 @@ module Apptokit
     def to_shell
 
     end
+
+    # This avoids overwriting methods and generating warnings
+    YAML_OPTS.each do |attr|
+      attr_reader attr unless method_defined?(attr)
+      attr_writer attr unless method_defined?(:"#{attr}=")
+    end
+    private(*YAML_OPTS.map { |s| "#{s}=".intern })
 
     private
 
