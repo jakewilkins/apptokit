@@ -6,6 +6,8 @@ Layout/EndAlignment:
   EnforcedStyleAlignWith: variable
 Layout/FirstHashElementIndentation:
   EnforcedStyle: consistent
+Layout/HashAlignment:
+  EnforcedHashRocketStyle: table
 
 Metrics/MethodLength:
   Max: 31
