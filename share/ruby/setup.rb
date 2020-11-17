@@ -54,6 +54,7 @@ module Apptokit
 
   def auto_open?
     return @auto_open if defined?(@auto_open)
+
     true
   end
 end

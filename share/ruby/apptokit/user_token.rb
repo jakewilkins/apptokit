@@ -120,7 +120,7 @@ module Apptokit
 
       Apptokit.open(
         oauth_url(callback_server.callback_url),
-        prompt:  "Please open the link below to continue authorizing application:"
+        prompt: "Please open the link below to continue authorizing application:"
       )
 
       begin
@@ -146,15 +146,15 @@ module Apptokit
       uri = URI("#{Apptokit.config.github_url}/login/oauth/access_token?")
 
       body = {
-        "client_id" => client_id,
+        "client_id"     => client_id,
         "client_secret" => client_secret,
-        key => code
+        key             => code
       }
       body["grant_type"] = "refresh_token" if refresh
 
       headers = {
         "Content-Type" => "application/x-www-form-urlencoded",
-        "User-Agent" => user_agent
+        "User-Agent"   => user_agent
       }
       headers["Cookie"] = cookie if cookie
 

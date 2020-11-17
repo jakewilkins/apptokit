@@ -40,9 +40,7 @@ module Apptokit
       @config = {}
     end
 
-    def read_from_env!
-
-    end
+    def read_from_env!; end
 
     def load!
       set_opts_from_yaml(HOME_DIR_CONF_PATH)
@@ -88,9 +86,7 @@ module Apptokit
       $stderr.puts msg
     end
 
-    def to_shell
-
-    end
+    def to_shell; end
 
     private
 
@@ -110,7 +106,7 @@ module Apptokit
       return unless path.exist?
 
       yaml = if RUBY_VERSION < '2.5'
-        YAML.load(path.read)
+        YAML.load(path.read) # rubocop:disable Security/YAMLLoad
       else
         YAML.safe_load(path.read, aliases: true)
       end
@@ -127,10 +123,10 @@ module Apptokit
     def set_opts_from_cached_manifest
       manifest_settings, raw_config = ManifestApp.load_from_cache(self)
 
-      unless raw_config == :unavailable
-        @config = @config.merge(manifest_settings)
-        @manifest_data = raw_config
-      end
+      return if raw_config == :unavailable
+
+      @config = @config.merge(manifest_settings)
+      @manifest_data = raw_config
     end
 
     def set_opts_from_env

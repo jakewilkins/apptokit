@@ -78,16 +78,14 @@ module Apptokit
 
       YAML_OPTS.each do |attr|
         value = config_loader.fetch(attr)
-        if value
-          send(:"#{attr}=", value)
-        end
+        send(:"#{attr}=", value) if value
       end
 
       @env = config_loader.env
 
-      if pem = config_loader.fetch("private_key")
-        @private_key = pem
-      end
+      return unless (pem = config_loader.fetch("private_key"))
+
+      @private_key = pem
     end
 
     def private_key
@@ -95,7 +93,7 @@ module Apptokit
         raise ApptokitError, "Private key path not set but required for using a private key." unless private_key_path && !private_key_path.to_s.empty?
 
         OpenSSL::PKey::RSA.new(File.read(private_key_path))
-      rescue OpenSSL::PKey::RSAError
+      rescue OpenSSL::PKey::RSAError # rubocop:disable Layout/RescueEnsureAlignment
         :unavailable
       end
     end
@@ -157,16 +155,14 @@ module Apptokit
       $stderr.puts msg
     end
 
-    def to_shell
-
-    end
+    def to_shell; end
 
     # This avoids overwriting methods and generating warnings
     YAML_OPTS.each do |attr|
       attr_reader attr unless method_defined?(attr)
       attr_writer attr unless method_defined?(:"#{attr}=")
     end
-    private(*YAML_OPTS.map { |s| "#{s}=".intern })
+    private(*YAML_OPTS.map { |s| "#{s}=".intern }) # rubocop:disable Style/AccessModifierDeclarations
 
     private
 

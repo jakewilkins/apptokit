@@ -30,7 +30,7 @@ module Apptokit
       load_from_cache(conf_loader)
     end
 
-    def install(conf_loader, cli_opts, manifest_response = nil)
+    def install(conf_loader, _cli_opts, manifest_response = nil)
       manifest_response ||= read_from_cache(conf_loader.env)
 
       return manifest_response['installation_id'] if manifest_response['installation_id']
@@ -44,7 +44,7 @@ module Apptokit
       manifest_response['installation_id'] = installation_id
       persist_to_cache(conf_loader.env, manifest_response)
 
-      opts, _ = load_from_cache(conf_loader)
+      opts, = load_from_cache(conf_loader)
       opts['installation_id']
     end
 
@@ -57,7 +57,7 @@ module Apptokit
     def convert_to_apptokit_opts(raw_manifest)
       key = begin
         OpenSSL::PKey::RSA.new(raw_manifest["pem"])
-      rescue OpenSSL::PKey::RSAError
+      rescue OpenSSL::PKey::RSAError # rubocop:disable Layout/RescueEnsureAlignment
         :unavailable
       end
       hash = {
@@ -65,7 +65,7 @@ module Apptokit
         "client_id"      => raw_manifest["client_id"],
         "private_key"    => key,
         "client_secret"  => raw_manifest["client_secret"],
-        "webhook_secret" => raw_manifest["webhook_secret"],
+        "webhook_secret" => raw_manifest["webhook_secret"]
       }
       hash["installation_id"] = raw_manifest["installation_id"] if raw_manifest["installation_id"]
 
@@ -87,6 +87,7 @@ module Apptokit
 
     def ensure_cache_dir_exists!
       return if @cache_dir_definitely_exists
+
       FileUtils.mkdir_p(CACHE_DIR) unless CACHE_DIR.exist?
       @cache_dir_definitely_exists = true
     end

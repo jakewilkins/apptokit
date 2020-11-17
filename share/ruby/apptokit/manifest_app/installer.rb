@@ -65,14 +65,13 @@ module Apptokit
         end
       end
 
-      def get_token(conf_loader)
+      def get_token(_conf_loader)
         Apptokit::JWT.new.header
       end
 
       def skip_app_installation?
         ENV.key?("SKIP_INSTALLATION")
       end
-
     end
   end
 end
