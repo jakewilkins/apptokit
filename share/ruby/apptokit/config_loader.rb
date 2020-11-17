@@ -109,7 +109,11 @@ module Apptokit
     def set_opts_from_yaml(path)
       return unless path.exist?
 
-      yaml = YAML.safe_load(path.read, aliases: true)
+      yaml = if RUBY_VERSION < '2.5'
+        YAML.load(path.read)
+      else
+        YAML.safe_load(path.read, aliases: true)
+      end
       set_opts_from_hash(yaml)
 
       @env = yaml["default_env"] unless env

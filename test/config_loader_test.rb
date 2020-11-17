@@ -18,6 +18,8 @@ class ConfigLoaderTest < TestCase
   def test_loads_conf_from_project_dir
     write_local_config('user_agent' => 'test')
 
+    p ENV.keys
+    p @loader.send(:config)
     @loader.reload!
 
     assert_equal 'bats', @loader.env
@@ -61,6 +63,7 @@ class ConfigLoaderTest < TestCase
     ENV.delete('GH_ENV')
 
     if TEST_GLOBAL_CONFIG.exist?
+      p ENV.keys
       puts TEST_GLOBAL_CONFIG.read
     else
       puts TEST_GLOBAL_CONFIG
