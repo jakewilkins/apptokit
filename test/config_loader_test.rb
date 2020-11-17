@@ -53,13 +53,20 @@ class ConfigLoaderTest < TestCase
     assert_equal 'Iv1.notreal', @loader.fetch('client_id')
     assert_equal 'notarealsecret', @loader.fetch('client_secret')
   ensure
-    FileUtils.rm(path)
+    FileUtils.rm(path) if path.exist?
   end
 
   def test_loads_example_env_file
     FileUtils.cp(TEST_DIR.dirname.join("share/apptokit-full-template.yml"), TEST_GLOBAL_CONFIG)
     ENV.delete('GH_ENV')
 
+    if TEST_GLOBAL_CONFIG.exist?
+      puts TEST_GLOBAL_CONFIG.read
+    else
+      puts TEST_GLOBAL_CONFIG
+      puts "doesn't exist?"
+      puts TEST_DIR
+    end
     @loader.reload!
 
     assert_equal 'test', @loader.env
