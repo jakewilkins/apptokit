@@ -18,10 +18,7 @@ class ConfigLoaderTest < TestCase
   def test_loads_conf_from_project_dir
     write_local_config('user_agent' => 'test')
 
-    p ENV.keys
-    p ENV["HOME"]
     @loader.reload!
-    p @loader.send(:config)
 
     assert_equal 'bats', @loader.env
     assert_equal './bats_private_key.pem', @loader.fetch('private_key_path')
@@ -63,14 +60,6 @@ class ConfigLoaderTest < TestCase
     FileUtils.cp(TEST_DIR.dirname.join("share/apptokit-full-template.yml"), TEST_GLOBAL_CONFIG)
     ENV.delete('GH_ENV')
 
-    if TEST_GLOBAL_CONFIG.exist?
-      p ENV.keys
-      puts TEST_GLOBAL_CONFIG.read
-    else
-      puts TEST_GLOBAL_CONFIG
-      puts "doesn't exist?"
-      puts TEST_DIR
-    end
     @loader.reload!
 
     assert_equal 'test', @loader.env

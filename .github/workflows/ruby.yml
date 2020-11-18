@@ -17,7 +17,6 @@ jobs:
       uses: actions/setup-ruby@v1
       with:
         ruby-version: ${{ matrix.ruby }}
-        architecture: 'x64'
     - name: Run tests
       env:
         BATS_APP_ID:  ${{ secrets.BATS_APP_ID }}
