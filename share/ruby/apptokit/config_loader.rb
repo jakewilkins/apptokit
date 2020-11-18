@@ -108,10 +108,10 @@ module Apptokit
         value = fetch(opt)
         next unless value
 
-        "APPTOKIT_#{opt.upcase}=\"#{value}\""
+        "APPTOKIT_#{opt.upcase}=#{value}"
       end.compact
-      values << "APPTOKIT_LOADED_ENV=\"#{env}\""
-      values << "APPTOKIT_DEFAULT_ENV=\"#{@default_env}\"" if @default_env
+      values << "APPTOKIT_LOADED_ENV=#{env}"
+      values << "APPTOKIT_DEFAULT_ENV=#{@default_env}" if @default_env
       values.join("\n")
     end
 
@@ -177,7 +177,7 @@ module Apptokit
       value = ENV["APPTOKIT_#{name.upcase}"]
       return unless value
 
-      value.gsub("\"", "")
+      value
     end
 
     def debug?
