@@ -24,5 +24,6 @@ jobs:
         BATS_CLIENT_ID:  ${{ secrets.BATS_CLIENT_ID }}
         BATS_CLIENT_SECRET:  ${{ secrets.BATS_CLIENT_SECRET }}
         BATS_PRIVATE_KEY:  ${{ secrets.BATS_PRIVATE_KEY }}
+        RUBY_VERSION: ${{ matrix.ruby }}
       run: |
         rake -f test/Rakefile

@@ -6,7 +6,7 @@ ENV['GH_ENV'] = 'bats'
 TEST_DIR = Pathname.new(__FILE__).dirname
 TMP_DIR = TEST_DIR.dirname.join("tmp")
 
-TEST_HOME_DIR = TMP_DIR.join("home")
+TEST_HOME_DIR = TMP_DIR.join("home/#{ENV["RUBY_VERSION"]}")
 TEST_HOME_CONFIG_DIR = TEST_HOME_DIR.join('.config')
 TEST_HOME_APPTOKIT_DIR = TEST_HOME_CONFIG_DIR.join('apptokit')
 TEST_GLOBAL_CONFIG = TEST_HOME_CONFIG_DIR.join('apptokit.yml')
