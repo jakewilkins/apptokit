@@ -21,7 +21,7 @@ class ConfigLoaderTest < TestCase
     p ENV.keys
     p ENV["HOME"]
     @loader.reload!
-    p @loader.config
+    p @loader.send(:config)
 
     assert_equal 'bats', @loader.env
     assert_equal './bats_private_key.pem', @loader.fetch('private_key_path')
