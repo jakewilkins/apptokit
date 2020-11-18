@@ -19,9 +19,9 @@ class ConfigLoaderTest < TestCase
     write_local_config('user_agent' => 'test')
 
     p ENV.keys
-    p ENV["home"]
-    p @loader.send(:config)
+    p ENV["HOME"]
     @loader.reload!
+    p @loader.config
 
     assert_equal 'bats', @loader.env
     assert_equal './bats_private_key.pem', @loader.fetch('private_key_path')
