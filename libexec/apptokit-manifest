@@ -34,8 +34,13 @@ fi
 require "setup"
 
 config_loader = Apptokit::ConfigLoader.new
-config_loader.load!
+config_loader.load_from_config!
 manifest = config_loader.manifest_data
+
+if manifest.nil?
+  puts "This environment is not configured as a manifest. Please specify 'manifest' settings."
+  exit
+end
 
 case ARGV.shift
 when "create"
@@ -62,7 +67,7 @@ when "show"
   unless manifest == :unavailable
     pp manifest
   else
-    puts "Manifest App not created, would create with:"
+    puts "Manifest App not created, configured with"
     pp config_loader.fetch('manifest')
   end
 when "edit"
