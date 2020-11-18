@@ -71,7 +71,31 @@ esac
 commands=(`apptokit commands --sh`)
 IFS="|"
 cat <<EOS
+_apptokit_clear_env() {
+  unset APPTOKIT_GITHUB_URL APPTOKIT_GITHUB_API_URL APPTOKIT_APP_ID APPTOKIT_INSTALLATION_ID APPTOKIT_PRIVATE_KEY_PATH APPTOKIT_WEBHOOK_SECRET APPTOKIT_CLIENT_ID APPTOKIT_CLIENT_SECRET APPTOKIT_INSTALLATION_KEYCACHE_EXPIRY APPTOKIT_USER_KEYCACHE_EXPIRY APPTOKIT_PERSONAL_ACCESS_TOKEN APPTOKIT_USER_AGENT APPTOKIT_COOKIE APPTOKIT_ACCEPT_HEADER APPTOKIT_LOADED_ENV APPTOKIT_DEFAULT_ENV APPTOKIT_PRIVATE_KEY
+  return 0
+}
 _apptokit_wrapper() {
+  if [[ "\$1 \$2" == "env clear" ]]; then
+    _apptokit_clear_env
+    unset GH_ENV
+    return 0
+  fi
+
+  local set_env=0
+
+  if [[ "\$1 \$2" == "env set" ]]; then
+    _apptokit_clear_env
+    if [[ -z "\$3" ]]; then
+      echo "usage: apptokit env set <environment name"
+      return 1
+    fi
+    shift; shift
+    export GH_ENV="\$1"
+    shift
+    1="env"
+  fi
+
   if [[ -z "\$GH_ENV" && ! -z "\$APPTOKIT_DEFAULT_ENV" ]]; then
     local GH_ENV="\$APPTOKIT_DEFAULT_ENV"
   fi
@@ -79,6 +103,7 @@ _apptokit_wrapper() {
   local old_ifs="$IFS"
   IFS=
   if [[ -z "\$APPTOKIT_LOADED_ENV" || "\$APPTOKIT_LOADED_ENV" != "\$GH_ENV" ]]; then
+    _apptokit_clear_env
     while read line; do
       export \$line
     done < <(ruby -I$APPTOKIT_RUBY_SHARE_PATH -rsetup -e "puts Apptokit::ConfigLoader.to_shell")
