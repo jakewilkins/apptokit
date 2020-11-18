@@ -26,4 +26,6 @@ jobs:
         BATS_PRIVATE_KEY:  ${{ secrets.BATS_PRIVATE_KEY }}
         RUBY_VERSION: ${{ matrix.ruby }}
       run: |
-        rake -f test/Rakefile
+        mkdir $RUBY_VERSION
+        cd $RUBY_VERSION
+        rake -f ../test/Rakefile
