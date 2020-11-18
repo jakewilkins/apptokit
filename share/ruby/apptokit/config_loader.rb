@@ -54,6 +54,9 @@ module Apptokit
 
     def reload!
       @config = {}
+      @manifest_data = nil
+      @env = nil
+      @default_env = nil
       load!
     end
 
@@ -142,14 +145,17 @@ module Apptokit
       return unless env
 
       env_overrides = yaml[env]
+      debug { $stderr.puts "loading #{env} from #{path} #{env_overrides.inspect}" }
       set_opts_from_hash(env_overrides) if env_overrides
     end
 
     def set_opts_from_cached_manifest
+      debug { $stderr.puts "loading manifest if available for #{env} #{@config}" }
       manifest_settings, raw_config = ManifestApp.load_from_cache(self)
 
       return if raw_config == :unavailable
 
+      debug { $stderr.puts "loading cached manifest #{manifest_settings} #{raw_config}" }
       @config = @config.merge(manifest_settings)
       @manifest_data = raw_config
     end
@@ -172,6 +178,10 @@ module Apptokit
       return unless value
 
       value.gsub("\"", "")
+    end
+
+    def debug?
+      ENV.key?("DEBUG")
     end
   end
 end

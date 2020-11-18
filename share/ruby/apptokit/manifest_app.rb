@@ -12,7 +12,10 @@ module Apptokit
     module_function
 
     def load_from_cache(conf_loader)
-      return [{}, :unavailable] unless cache_path(conf_loader.env).exist?
+      unless cache_path(conf_loader.env).exist?
+        conf_loader.debug("manifest path doesn't exist: #{cache_path(conf_loader.env)}")
+        return [{}, :unavailable]
+      end
 
       opts = read_from_cache(conf_loader.env)
 
@@ -82,7 +85,7 @@ module Apptokit
     end
 
     def cache_path(env)
-      @cache_path ||= CACHE_DIR.join("#{env}.yml")
+      CACHE_DIR.join("#{env}.yml")
     end
 
     def ensure_cache_dir_exists!
