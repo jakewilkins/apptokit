@@ -80,8 +80,12 @@ module Apptokit
       end
     end
 
-    def set(attr, value)
-      config[attr.intern] = value
+    def private_key_path
+      config['private_key_path'] ||= Dir[private_key_path_glob].max
+    end
+
+    def private_key_path_glob
+      config['private_key_path_glob'] ||= Pathname.new(Dir.pwd).join("*.pem")
     end
 
     def env

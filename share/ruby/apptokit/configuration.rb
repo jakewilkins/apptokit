@@ -98,14 +98,6 @@ module Apptokit
       @private_key_path = Pathname.new(path)
     end
 
-    def private_key_path
-      @private_key_path ||= Dir[private_key_path_glob].max
-    end
-
-    def private_key_path_glob
-      @private_key_path_glob ||= Pathname.new(Dir.pwd).join("*.pem")
-    end
-
     def github_url=(arg)
       arg = arg[0..-2] if arg[-1] == "/"
       @github_url = URI(arg)
