@@ -33,6 +33,10 @@ module Apptokit
       new.tap(&:load!)
     end
 
+    def self.to_shell
+      new.tap(&:load_from_config!).to_shell
+    end
+
     attr_reader :config, :manifest_data
     private :config
 
@@ -40,18 +44,28 @@ module Apptokit
       @config = {}
     end
 
-    def read_from_env!; end
-
     def load!
-      set_opts_from_yaml(HOME_DIR_CONF_PATH)
-      set_opts_from_yaml(PROJECT_DIR_CONF_PATH)
-      set_opts_from_cached_manifest
-      set_opts_from_env
+      if ENV.key?("APPTOKIT_LOADED_ENV") && read_from_env("loaded_env") == env
+        read_from_env!
+      else
+        load_from_config!
+      end
     end
 
     def reload!
       @config = {}
       load!
+    end
+
+    def read_from_env!
+      set_opts_from_env
+    end
+
+    def load_from_config!
+      set_opts_from_yaml(HOME_DIR_CONF_PATH)
+      set_opts_from_yaml(PROJECT_DIR_CONF_PATH)
+      set_opts_from_cached_manifest
+      set_opts_from_env
     end
 
     def fetch(var, default = nil, &block)
@@ -67,8 +81,12 @@ module Apptokit
       config[attr.intern] = value
     end
 
+    def default_env
+      @default_env
+    end
+
     def env
-      @env ||= ENV["APPTOKIT_ENV"] || ENV["GH_ENV"] || config['default_env']
+      @env ||= ENV["APPTOKIT_ENV"] || ENV["GH_ENV"] || read_from_env("default_env") || @default_env
     end
 
     def env_from_manifest?
@@ -86,7 +104,17 @@ module Apptokit
       $stderr.puts msg
     end
 
-    def to_shell; end
+    def to_shell
+      values = Configuration::DUMPABLE_OPTIONS.map do |opt|
+        value = fetch(opt)
+        next unless value
+
+        "APPTOKIT_#{opt.upcase}=\"#{value}\""
+      end.compact
+      values << "APPTOKIT_LOADED_ENV=\"#{env}\""
+      values << "APPTOKIT_DEFAULT_ENV=\"#{@default_env}\"" if @default_env
+      "#{values.join("\n")}"
+    end
 
     private
 
@@ -112,6 +140,7 @@ module Apptokit
       end
       set_opts_from_hash(yaml)
 
+      @default_env = yaml["default_env"] if yaml["default_env"]
       @env = yaml["default_env"] unless env
 
       return unless env
@@ -131,12 +160,21 @@ module Apptokit
 
     def set_opts_from_env
       set_opts_from_hash(Apptokit::Configuration::YAML_OPTS.each_with_object({}) do |opt, out|
-        out[opt] = ENV["APPTOKIT_#{opt.upcase}"]
+        value = read_from_env(opt)
+        next unless value
+        out[opt] = value
       end)
     end
 
     def realize_manifest?
       !ENV.key?("LIMITED_MANIFEST")
+    end
+
+    def read_from_env(name)
+      value = ENV["APPTOKIT_#{name.upcase}"]
+      return unless value
+
+      value.gsub("\"", "")
     end
   end
 end

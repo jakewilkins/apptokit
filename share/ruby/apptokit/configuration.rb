@@ -70,11 +70,7 @@ module Apptokit
     end
 
     def load_env(config_loader)
-      if ENV.key?("APPTOKIT_LOADED_ENV") && ENV["APPTOKIT_LOADED_ENV"] == env
-        config_loader.read_from_env!
-      else
-        config_loader.load!
-      end
+      config_loader.load!
 
       YAML_OPTS.each do |attr|
         value = config_loader.fetch(attr)
@@ -153,17 +149,6 @@ module Apptokit
       return block.call if block
 
       $stderr.puts msg
-    end
-
-    def to_shell
-      values = DUMPABLE_OPTIONS.map do |opt|
-        value = send(opt)
-        next unless value
-
-        "export APPTOKIT_#{opt.upcase}=\"#{value}\""
-      end.compact
-      values << "APPTOKIT_LOADED_ENV=\"#{env}\""
-      values.join("\n")
     end
 
     # This avoids overwriting methods and generating warnings

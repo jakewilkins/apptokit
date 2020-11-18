@@ -72,6 +72,19 @@ commands=(`apptokit commands --sh`)
 IFS="|"
 cat <<EOS
 _apptokit_wrapper() {
+  if [[ -z "\$GH_ENV" && ! -z "\$APPTOKIT_DEFAULT_ENV" ]]; then
+    local GH_ENV="\$APPTOKIT_DEFAULT_ENV"
+  fi
+
+  local old_ifs="$IFS"
+  IFS=
+  if [[ -z "\$APPTOKIT_LOADED_ENV" || "\$APPTOKIT_LOADED_ENV" != "\$GH_ENV" ]]; then
+    while read line; do
+      export \$line
+    done < <(ruby -I$APPTOKIT_RUBY_SHARE_PATH -rsetup -e "puts Apptokit::ConfigLoader.to_shell")
+  fi
+  IFS="\$old_ifs"
+
   local command="\$1"
   if [ "\$#" -gt 0 ]; then
     shift
@@ -94,6 +107,7 @@ bash )
   echo "alias apptokit=_apptokit_wrapper"
   ;;
 zsh )
-  echo "apptokit=_apptokit_wrapper"
+  echo "alias apptokit=_apptokit_wrapper"
+  # echo "apptokit=_apptokit_wrapper"
   ;;
 esac
