@@ -46,8 +46,10 @@ module Apptokit
 
     def load!
       if ENV.key?("APPTOKIT_LOADED_ENV") && read_from_env("loaded_env") == env
+        debug("Loading #{env} from ENV vars")
         read_from_env!
       else
+        debug("Loading #{env} from config files")
         load_from_config!
       end
     end
@@ -114,8 +116,8 @@ module Apptokit
 
         "APPTOKIT_#{opt.upcase}=#{value}"
       end.compact
-      values << "APPTOKIT_LOADED_ENV=#{env}" unless env_from_manifest? && @manifest_data.nil?
-      values << "APPTOKIT_PRIVATE_KEY=\"#{@manifest_data['pem'].gsub("\n", "|")}\"" if env_from_manifest? && @manifest_data
+      values << "APPTOKIT_LOADED_ENV=#{env}" unless env_from_manifest? && @manifest_data == :unavailable
+      values << "APPTOKIT_PRIVATE_KEY=\"#{@manifest_data['pem'].gsub("\n", "|")}\"" if env_from_manifest? && @manifest_data != :unavailable
       values << "APPTOKIT_DEFAULT_ENV=#{@default_env}" if @default_env
       values.join("\n")
     end
@@ -175,10 +177,6 @@ module Apptokit
       if ENV.key?("APPTOKIT_PRIVATE_KEY")
         config["private_key"] = OpenSSL::PKey::RSA.new(ENV["APPTOKIT_PRIVATE_KEY"].gsub("|", "\n").gsub('"', ""))
       end
-    end
-
-    def realize_manifest?
-      !ENV.key?("LIMITED_MANIFEST")
     end
 
     def read_from_env(name)

@@ -39,7 +39,7 @@ manifest = config_loader.manifest_data
 
 case ARGV.shift
 when "create"
-  unless manifest.nil?
+  unless manifest == :unavailable
     puts "Manifest already created, run `manifest drop` to remove it. Printed below for reference:"
     pp manifest
     exit
@@ -59,7 +59,7 @@ when "install"
   puts "#{config_loader.env} installed, installation id: #{installation_id}"
 when "show"
   puts "Manifest for env: #{config_loader.env}"
-  unless manifest.nil?
+  unless manifest == :unavailable
     pp manifest
   else
     puts "Manifest App not created, would create with:"
@@ -67,7 +67,7 @@ when "show"
   end
 when "edit"
   puts "Editing manifest for env: #{config_loader.env}"
-  unless manifest.nil?
+  unless manifest == :unavailable
     Tempfile.create("apptokit-#{config_loader.env}") do |f|
       f.sync = true
       f.puts JSON.pretty_generate(manifest)
