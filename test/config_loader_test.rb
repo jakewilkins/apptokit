@@ -19,6 +19,7 @@ class ConfigLoaderTest < TestCase
     write_local_config('user_agent' => 'test')
 
     p ENV.keys
+    p ENV["home"]
     p @loader.send(:config)
     @loader.reload!
 
