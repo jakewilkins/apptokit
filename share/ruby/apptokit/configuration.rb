@@ -153,7 +153,7 @@ module Apptokit
     private
 
     def debug?
-      ENV.key?("DEBUG")
+      ENV["DEBUG"] == "config"
     end
   end
 end

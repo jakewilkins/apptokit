@@ -93,7 +93,7 @@ module Apptokit
     end
 
     def env_from_manifest?
-      config['manifest_url'].present? || !manifest_data.nil?
+      config.key?('manifest_url') || config.key?('manifest')
     end
 
     def clear_manifest_cache!
@@ -114,7 +114,8 @@ module Apptokit
 
         "APPTOKIT_#{opt.upcase}=#{value}"
       end.compact
-      values << "APPTOKIT_LOADED_ENV=#{env}"
+      values << "APPTOKIT_LOADED_ENV=#{env}" unless env_from_manifest? && @manifest_data.nil?
+      values << "APPTOKIT_PRIVATE_KEY=\"#{@manifest_data['pem'].gsub("\n", "|")}\"" if env_from_manifest? && @manifest_data
       values << "APPTOKIT_DEFAULT_ENV=#{@default_env}" if @default_env
       values.join("\n")
     end
@@ -155,13 +156,12 @@ module Apptokit
 
     def set_opts_from_cached_manifest
       debug { $stderr.puts "loading manifest if available for #{env} #{@config}" }
-      manifest_settings, raw_config = ManifestApp.load_from_cache(self)
+      manifest_settings, @manifest_data = ManifestApp.load_from_cache(self)
 
-      return if raw_config == :unavailable
+      return if @manifest_data == :unavailable
 
-      debug { $stderr.puts "loading cached manifest #{manifest_settings} #{raw_config}" }
+      debug { $stderr.puts "loading cached manifest #{manifest_settings} #{@manifest_data}" }
       @config = @config.merge(manifest_settings)
-      @manifest_data = raw_config
     end
 
     def set_opts_from_env
@@ -171,6 +171,10 @@ module Apptokit
 
         out[opt] = value
       end)
+
+      if ENV.key?("APPTOKIT_PRIVATE_KEY")
+        config["private_key"] = OpenSSL::PKey::RSA.new(ENV["APPTOKIT_PRIVATE_KEY"].gsub("|", "\n").gsub('"', ""))
+      end
     end
 
     def realize_manifest?
@@ -185,7 +189,7 @@ module Apptokit
     end
 
     def debug?
-      ENV.key?("DEBUG")
+      ENV["DEBUG"] == "config"
     end
   end
 end
