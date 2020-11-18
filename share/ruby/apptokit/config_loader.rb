@@ -37,7 +37,7 @@ module Apptokit
       new.tap(&:load_from_config!).to_shell
     end
 
-    attr_reader :config, :manifest_data
+    attr_reader :config, :manifest_data, :default_env
     private :config
 
     def initialize
@@ -81,10 +81,6 @@ module Apptokit
       config[attr.intern] = value
     end
 
-    def default_env
-      @default_env
-    end
-
     def env
       @env ||= ENV["APPTOKIT_ENV"] || ENV["GH_ENV"] || read_from_env("default_env") || @default_env
     end
@@ -113,7 +109,7 @@ module Apptokit
       end.compact
       values << "APPTOKIT_LOADED_ENV=\"#{env}\""
       values << "APPTOKIT_DEFAULT_ENV=\"#{@default_env}\"" if @default_env
-      "#{values.join("\n")}"
+      values.join("\n")
     end
 
     private
@@ -162,6 +158,7 @@ module Apptokit
       set_opts_from_hash(Apptokit::Configuration::YAML_OPTS.each_with_object({}) do |opt, out|
         value = read_from_env(opt)
         next unless value
+
         out[opt] = value
       end)
     end
