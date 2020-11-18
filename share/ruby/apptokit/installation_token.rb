@@ -66,15 +66,9 @@ module Apptokit
         self.token      = hash["token"]
         self.expires_at = hash["expires_at"]
       when Net::HTTPNotFound
-        if Apptokit.config.env_from_manifest?
-          Apptokit.config.clear_manifest_cache!
-          $stderr.puts "The cached manifest information is no longer valid, we removed it."
-          $stderr.puts "Please try this command again"
-          exit 16
-        else
-          $stderr.puts "The installation token you provided is innaccessible, please verify it"
-          exit 15
-        end
+        $stderr.puts "The installation ID you provided is innaccessible, please verify it"
+        $stderr.puts "If this App is managed via 'apptokit manifest' you can create an installation with 'apptokit manifest install'"
+        exit 15
       else
         raise ApptokitError, "Could not create an Installation Token: #{response.code}\n\n#{response.body}"
       end
