@@ -155,7 +155,16 @@ module Apptokit
       $stderr.puts msg
     end
 
-    def to_shell; end
+    def to_shell
+      values = DUMPABLE_OPTIONS.map do |opt|
+        value = send(opt)
+        next unless value
+
+        "export APPTOKIT_#{opt.upcase}=\"#{value}\""
+      end.compact
+      values << "APPTOKIT_LOADED_ENV=\"#{env}\""
+      values.join("\n")
+    end
 
     # This avoids overwriting methods and generating warnings
     YAML_OPTS.each do |attr|
