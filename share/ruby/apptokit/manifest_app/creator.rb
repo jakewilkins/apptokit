@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'net/http'
+# require 'net/http'
 require 'erb'
 require 'tempfile'
 
@@ -73,8 +73,7 @@ module Apptokit
       end
 
       def exchange_code_for_app_settings
-        uri = URI("#{config.github_api_url}/app-manifests/#{code}/conversions")
-        res = Net::HTTP.post(uri, "", { "Accept" => "application/vnd.github.fury-preview+json" })
+        res = HTTP.post("/app-manifests/#{code}/conversions")
 
         case res
         when Net::HTTPSuccess
@@ -120,7 +119,7 @@ module Apptokit
       end
 
       def fetch_manifest_from_url
-        res = Net::HTTP.get(URI(config.manifest_url))
+        res = HTTP.get(URI(config.manifest_url))
 
         case res
         when Net::HTTPSuccess

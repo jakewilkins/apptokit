@@ -62,3 +62,4 @@ end
 require 'apptokit/configuration'
 require 'apptokit/config_loader'
 require 'apptokit/manifest_app'
+require 'apptokit/http'

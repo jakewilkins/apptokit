@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'apptokit/jwt'
-require 'net/http'
 require 'json'
 
 require "apptokit/key_cache"
@@ -50,15 +49,9 @@ module Apptokit
     end
 
     def perform_generation
-      uri = URI(installation_token_url)
-      request = Net::HTTP::Post.new(uri)
-      request["User-Agent"] = (ENV["USER_AGENT"] || "Apptokit")
-      request["Accept"] = "application/vnd.github.machine-man-preview+json"
-      request["Authorization"] = jwt.header
+      raise ApptokitError, "An Installation ID is required for generating an Installation Token" unless installation_id
 
-      response = Net::HTTP.start(uri.hostname, uri.port, nil, nil, nil, nil, use_ssl: uri.scheme == "https") do |http|
-        http.request(request)
-      end
+      response = HTTP.post("/app/installations/#{installation_id}/access_tokens", auth: jwt.header)
 
       case response
       when Net::HTTPSuccess then
@@ -81,10 +74,6 @@ module Apptokit
 
     def jwt
       @jwt ||= JWT.generate
-    end
-
-    def installation_token_url
-      URI("#{Apptokit.config.github_api_url}/app/installations/#{installation_id}/access_tokens")
     end
   end
 end

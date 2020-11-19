@@ -143,7 +143,6 @@ module Apptokit
 
     def exchange_code_for_token(code, refresh: false)
       key = refresh ? "refresh_token" : "code"
-      uri = URI("#{Apptokit.config.github_url}/login/oauth/access_token?")
 
       body = {
         "client_id"     => client_id,
@@ -152,13 +151,11 @@ module Apptokit
       }
       body["grant_type"] = "refresh_token" if refresh
 
-      headers = {
-        "Content-Type" => "application/x-www-form-urlencoded",
-        "User-Agent"   => user_agent
-      }
-      headers["Cookie"] = cookie if cookie
-
-      res = Net::HTTP.post(uri, URI.encode_www_form(body), headers)
+      res = HTTP.post("/login/oauth/access_token",
+        body: URI.encode_www_form(body),
+        headers: { "Content-Type" => "application/x-www-form-urlencoded", "Accept" => "*/*" },
+        type: :dotcom
+      )
 
       case res
       when Net::HTTPSuccess

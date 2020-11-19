@@ -6,10 +6,6 @@ module Apptokit
       module_function
 
       def call(url:, name:, conf_loader:)
-        return if skip_app_installation?
-
-        ENV["INSTALLING_APP"] = "true"
-
         install_url = "#{url}/installations/new"
         Apptokit.open(install_url)
 
@@ -20,11 +16,11 @@ module Apptokit
 
         Apptokit.config = Apptokit::Configuration.new(conf_loader.env, conf_loader)
         token = get_token(conf_loader)
-        installation_uri = URI("#{Apptokit.config.github_api_url}/app/installations")
+        # installation_uri = URI("#{Apptokit.config.github_api_url}/app/installations")
 
         loop do
           count += 1
-          installations = get_installations(token, installation_uri)
+          installations = get_installations(token)
 
           installation = installations.first
           sleep 2 unless installation
@@ -43,15 +39,8 @@ module Apptokit
         installation["id"]
       end
 
-      def get_installations(token, uri)
-        # puts "fetching installations #{uri}"
-        response = Net::HTTP.start(uri.host, uri.port, use_ssl: uri.scheme == "https") do |http|
-          req = Net::HTTP::Get.new(uri)
-          req["User-Agent"] = Apptokit.config.user_agent
-          req["Authorization"] = token
-
-          http.request(req)
-        end
+      def get_installations(token)
+        response = HTTP.get("/app/installations", auth: token)
 
         case response
         when Net::HTTPSuccess
@@ -67,10 +56,6 @@ module Apptokit
 
       def get_token(_conf_loader)
         Apptokit::JWT.new.header
-      end
-
-      def skip_app_installation?
-        ENV.key?("SKIP_INSTALLATION")
       end
     end
   end
