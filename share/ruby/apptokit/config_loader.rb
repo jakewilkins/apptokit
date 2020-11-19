@@ -83,6 +83,8 @@ module Apptokit
     end
 
     def private_key_path
+      return :manifest if env_from_manifest?
+
       config['private_key_path'] ||= Dir[private_key_path_glob].max
     end
 

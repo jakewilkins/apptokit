@@ -95,6 +95,8 @@ module Apptokit
     end
 
     def private_key_path=(path)
+      return if path == :manifest
+
       @private_key_path = Pathname.new(path)
     end
 
