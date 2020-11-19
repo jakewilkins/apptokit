@@ -14,6 +14,7 @@
 #
 
 if [[ "$1" == "--complete" ]]; then
+  echo "setup"
   echo "show"
   echo "drop"
   echo "install"
@@ -21,7 +22,7 @@ if [[ "$1" == "--complete" ]]; then
   echo "create"
   exit
 else
-  if [[ ! "$1" =~ ^(show|drop|create|edit|install)$ ]]; then
+  if [[ ! "$1" =~ ^(show|drop|create|edit|install|setup)$ ]]; then
     (>&2 echo "invalid manifest command '$1'")
     apptokit help manifest
     exit 4
@@ -42,8 +43,7 @@ if manifest.nil?
   exit
 end
 
-case ARGV.shift
-when "create"
+def create(manifest, config_loader)
   unless manifest == :unavailable
     puts "Manifest already created, run `manifest drop` to remove it. Printed below for reference:"
     pp manifest
@@ -59,9 +59,21 @@ when "create"
   end
   puts "Manifest App created for #{config_loader.env}"
   pp manifest
-when "install"
+end
+
+def install(config_loader)
   installation_id = Apptokit::ManifestApp.install(config_loader, {})
   puts "#{config_loader.env} installed, installation id: #{installation_id}"
+end
+
+case ARGV.shift
+when "create"
+  create(manifest, config_loader)
+when "install"
+  install(config_loader)
+when "setup"
+  create(manifest, config_loader)
+  install(config_loader)
 when "show"
   puts "Manifest for env: #{config_loader.env}"
   unless manifest == :unavailable
