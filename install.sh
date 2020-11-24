@@ -49,7 +49,7 @@ function install {
   mkdir -pv $LIB_DIR/bin
 
   pushd $CLONE_DIR
-  git fetch $TAG
+  git fetch origin $TAG
   git checkout $TAG
 
   for move in "${LIB_MOVES[@]}"; do
