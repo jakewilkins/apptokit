@@ -141,7 +141,7 @@ module Apptokit
     def set_opts_from_yaml(path)
       return unless path.exist?
 
-      yaml = if RUBY_VERSION < '2.5'
+      yaml = if RUBY_VERSION < '2.6'
         YAML.load(path.read) # rubocop:disable Security/YAMLLoad
       else
         YAML.safe_load(path.read, aliases: true)
