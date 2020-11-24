@@ -40,6 +40,8 @@ function install {
   LIB_MOVES=("completions" "libexec" "share" "LICENSE")
   CLONE_DIR="./.apptokit-temp_clone"
 
+  [ -d "$CLONE_DIR" ] && rm -rf "$CLONE_DIR"
+
   git clone $PROJECT_GIT_URL $CLONE_DIR
 
   mkdir -pv $LIB_DIR
@@ -47,6 +49,7 @@ function install {
   mkdir -pv $LIB_DIR/bin
 
   pushd $CLONE_DIR
+  git fetch $TAG
   git checkout $TAG
 
   for move in "${LIB_MOVES[@]}"; do
