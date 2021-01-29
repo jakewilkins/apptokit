@@ -68,13 +68,13 @@ if $stdout.isatty
     Kernel.exec(ENV["EDITOR"], Apptokit::ConfigLoader::HOME_DIR_CONF_PATH.to_s)
   elsif list_envs
     puts "Apptokit knows about these environments:"
-    Apptokit::ConfigLoader.environments.each do |env|
-      env = Apptokit::Configuration.new(env)
+    Apptokit::ConfigLoader.environments.each do |env_string|
+      env = Apptokit::Configuration.new(env_string)
       url = env.github_url == Apptokit::Configuration::DEFAULT_GITHUB_URL ? nil : env.github_url
       api_url = env.github_api_url == Apptokit::Configuration::DEFAULT_GITHUB_API_URL ? nil : env.github_api_url
       urls = [url, api_url].compact
       urls = urls.any? ? " (#{urls.join(', ')})" : ""
-      puts " - #{env.env}#{urls}"
+      puts " - #{env_string}#{urls}"
     end
   elsif show_envs.any?
     show_envs.each do |env|
