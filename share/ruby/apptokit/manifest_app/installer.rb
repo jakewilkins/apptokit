@@ -16,7 +16,6 @@ module Apptokit
 
         Apptokit.config = Apptokit::Configuration.new(conf_loader.env, conf_loader)
         token = get_token(conf_loader)
-        # installation_uri = URI("#{Apptokit.config.github_api_url}/app/installations")
 
         loop do
           count += 1

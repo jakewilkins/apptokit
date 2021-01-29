@@ -71,9 +71,11 @@ when "create"
   create(manifest, config_loader)
 when "install"
   install(config_loader)
+  exit Apptokit::RELOAD_ENV_EXIT_CODE
 when "setup"
   create(manifest, config_loader)
   install(config_loader)
+  exit Apptokit::RELOAD_ENV_EXIT_CODE
 when "show"
   puts "Manifest for env: #{config_loader.env}"
   unless manifest == :unavailable
@@ -108,6 +110,8 @@ when "drop"
   puts "dropping manifest for env: #{config_loader.env}"
   Apptokit::ManifestApp.delete_cache(config_loader)
   puts "done."
+
+  exit Apptokit::RELOAD_ENV_EXIT_CODE
 end
 
 # vim: set ft=ruby:

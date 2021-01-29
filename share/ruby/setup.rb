@@ -8,6 +8,8 @@ require 'uri'
 module Apptokit
   VERSION = '0.1.0'
 
+  RELOAD_ENV_EXIT_CODE = 234
+
   class ApptokitError < RuntimeError
     attr_reader :type
 
