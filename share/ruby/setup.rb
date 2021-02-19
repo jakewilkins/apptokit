@@ -36,7 +36,7 @@ module Apptokit
   end
 
   def open(url, prompt: nil)
-    if auto_open?
+    if auto_open? && ENV.key?("BROWSER")
       `$BROWSER #{url}`
     else
       if prompt
