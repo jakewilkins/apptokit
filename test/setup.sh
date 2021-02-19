@@ -1,4 +1,5 @@
 
+
 mkdir -p ~/.config/apptokit
 
 [ -f "./.apptokit.yml" ] && rm .apptokit.yml

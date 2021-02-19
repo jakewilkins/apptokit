@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -e
+
+exec ruby -rsetup -rpry -e "binding.pry"

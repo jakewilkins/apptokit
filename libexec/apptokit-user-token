@@ -69,7 +69,7 @@ begin
   elsif options.key?(:"get-code")
     Apptokit::UserToken.get_code(auto_open: options[:auto_open], user: options[:user])
   else
-    Apptokit::UserToken.generate(options)
+    Apptokit::UserToken.generate(**options)
   end
 rescue Apptokit::ApptokitError => e
   $stderr.puts e.message

@@ -1,7 +1,22 @@
+require 'pathname'
 require 'minitest/autorun'
 
 ENV['GH_ENV'] = 'bats'
 
+TEST_DIR = Pathname.new(__FILE__).dirname
+TMP_DIR = TEST_DIR.dirname.join("tmp")
+
+TEST_HOME_DIR = TMP_DIR.join("home/#{ENV["RUBY_VERSION"]}")
+TEST_HOME_CONFIG_DIR = TEST_HOME_DIR.join('.config')
+TEST_HOME_APPTOKIT_DIR = TEST_HOME_CONFIG_DIR.join('apptokit')
+TEST_GLOBAL_CONFIG = TEST_HOME_CONFIG_DIR.join('apptokit.yml')
+
+TEST_LOCAL_CONFIG = Pathname.new(Dir.pwd).join('.apptokit.yml')
+DEFAULT_TEST_GLOBAL_CONFIG = TEST_DIR.join('env.yml')
+
+TEST_HOME_APPTOKIT_DIR.mkpath unless TEST_HOME_APPTOKIT_DIR.exist?
+
+ENV["HOME"] = TEST_HOME_DIR.to_s
 
 require 'setup'
 
@@ -32,4 +47,29 @@ end
 
 class TestCase < Minitest::Test
   include AssertionHelpers
+
+  def reset_global_config
+    FileUtils.cp(DEFAULT_TEST_GLOBAL_CONFIG, TEST_GLOBAL_CONFIG)
+  end
+
+  def reset_local_config
+    FileUtils.rm(TEST_LOCAL_CONFIG) if TEST_LOCAL_CONFIG.exist?
+  end
+
+  def reset!
+    reset_global_config
+    reset_local_config
+  end
+
+  def write_global_config(hash, env: 'bats')
+    File.write(TEST_GLOBAL_CONFIG, {env => hash}.to_yaml)
+  end
+
+  def write_local_config(hash, env: 'bats')
+    File.write(TEST_LOCAL_CONFIG, {env => hash}.to_yaml)
+  end
+
+  def teardown
+    reset!
+  end
 end

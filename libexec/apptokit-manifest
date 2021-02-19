@@ -14,6 +14,7 @@
 #
 
 if [[ "$1" == "--complete" ]]; then
+  echo "setup"
   echo "show"
   echo "drop"
   echo "install"
@@ -21,7 +22,7 @@ if [[ "$1" == "--complete" ]]; then
   echo "create"
   exit
 else
-  if [[ ! "$1" =~ ^(show|drop|create|edit|install)$ ]]; then
+  if [[ ! "$1" =~ ^(show|drop|create|edit|install|setup)$ ]]; then
     (>&2 echo "invalid manifest command '$1'")
     apptokit help manifest
     exit 4
@@ -31,49 +32,64 @@ fi
 
 #!ruby
 
-ENV["LIMITED_MANIFEST"] = 'true'
-ENV["INSTALLING_APP"] = 'true'
-
 require "setup"
 
-config = Apptokit.config
-manifest = config.send(:manifest_settings)
+config_loader = Apptokit::ConfigLoader.new
+config_loader.load_from_config!
+manifest = config_loader.manifest_data
 
-case ARGV.shift
-when "create"
-  if manifest.loaded?
+if manifest.nil?
+  puts "This environment is not configured as a manifest. Please specify 'manifest' settings."
+  exit
+end
+
+def create(manifest, config_loader)
+  unless manifest == :unavailable
     puts "Manifest already created, run `manifest drop` to remove it. Printed below for reference:"
-    pp manifest.app_settings
+    pp manifest
     exit
   end
 
   begin
-    Apptokit::Configuration.loading_manifest do
-      manifest.fetch
-    end
+    _, manifest = Apptokit::ManifestApp.create(config_loader)
   rescue Apptokit::ApptokitError => boom
     raise boom unless boom.type == :manifest_creation_failed
     $stderr.puts boom.message
     exit 6
   end
-  puts "Manifest App created for #{config.env}"
-  pp manifest.app_settings
+  puts "Manifest App created for #{config_loader.env}"
+  pp manifest
+end
+
+def install(config_loader)
+  installation_id = Apptokit::ManifestApp.install(config_loader, {})
+  puts "#{config_loader.env} installed, installation id: #{installation_id}"
+end
+
+case ARGV.shift
+when "create"
+  create(manifest, config_loader)
 when "install"
-  manifest.install_app
+  install(config_loader)
+  exit Apptokit::RELOAD_ENV_EXIT_CODE
+when "setup"
+  create(manifest, config_loader)
+  install(config_loader)
+  exit Apptokit::RELOAD_ENV_EXIT_CODE
 when "show"
-  puts "Manifest for env: #{config.env}"
-  if manifest.loaded?
-    pp manifest.app_settings
+  puts "Manifest for env: #{config_loader.env}"
+  unless manifest == :unavailable
+    pp manifest
   else
-    puts "Manifest App not created, would create with:"
-    pp manifest.yaml_conf
+    puts "Manifest App not created, configured with"
+    pp config_loader.fetch('manifest')
   end
 when "edit"
-  puts "Editing manifest for env: #{config.env}"
-  if manifest.loaded?
-    Tempfile.create("apptokit-#{config.env}") do |f|
+  puts "Editing manifest for env: #{config_loader.env}"
+  unless manifest == :unavailable
+    Tempfile.create("apptokit-#{config_loader.env}") do |f|
       f.sync = true
-      f.puts JSON.pretty_generate(manifest.app_settings)
+      f.puts JSON.pretty_generate(manifest)
 
       system(ENV["EDITOR"], f.path)
       f.rewind
@@ -84,16 +100,18 @@ when "edit"
         puts "Error parsing JSON: #{boom.message}\n#{updated_conf}"
         exit 18
       end
-      manifest.persist_to_cache(updated_conf)
+      Apptokit::ManifestApp.persist_to_cache(config_loader.env, updated_conf)
     end
     puts "done."
   else
     puts "Manifest App not created, edit config in your apptokit.yml"
   end
 when "drop"
-  puts "dropping manifest for env: #{config.env}"
-  config.clear_manifest_cache!
+  puts "dropping manifest for env: #{config_loader.env}"
+  Apptokit::ManifestApp.delete_cache(config_loader)
   puts "done."
+
+  exit Apptokit::RELOAD_ENV_EXIT_CODE
 end
 
 # vim: set ft=ruby:

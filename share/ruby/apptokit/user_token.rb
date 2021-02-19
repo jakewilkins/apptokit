@@ -118,11 +118,10 @@ module Apptokit
       callback_server = CallbackServer.new(mutex, condition_variable)
       callback_server.start
 
-      if auto_open
-        `$BROWSER '#{oauth_url(callback_server.callback_url)}'`
-      else
-        puts "Please open the link below to continue authorizing application:\n\n  #{oauth_url(callback_server.callback_url)}\n\n"
-      end
+      Apptokit.open(
+        oauth_url(callback_server.callback_url),
+        prompt: "Please open the link below to continue authorizing application:"
+      )
 
       begin
         mutex.synchronize { condition_variable.wait(mutex, 60) }
@@ -144,22 +143,19 @@ module Apptokit
 
     def exchange_code_for_token(code, refresh: false)
       key = refresh ? "refresh_token" : "code"
-      uri = URI("#{Apptokit.config.github_url}/login/oauth/access_token?")
 
       body = {
-        "client_id" => client_id,
+        "client_id"     => client_id,
         "client_secret" => client_secret,
-        key => code
+        key             => code
       }
       body["grant_type"] = "refresh_token" if refresh
 
-      headers = {
-        "Content-Type" => "application/x-www-form-urlencoded",
-        "User-Agent" => user_agent
-      }
-      headers["Cookie"] = cookie if cookie
-
-      res = Net::HTTP.post(uri, URI.encode_www_form(body), headers)
+      res = HTTP.post("/login/oauth/access_token",
+        body: URI.encode_www_form(body),
+        headers: { "Content-Type" => "application/x-www-form-urlencoded", "Accept" => "*/*" },
+        type: :dotcom
+      )
 
       case res
       when Net::HTTPSuccess

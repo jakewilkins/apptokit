@@ -82,12 +82,13 @@ module Apptokit
     attr_writer :request, :port, :bind, :path, :hostname
     private :mutex, :condition_variable, :thread, :request, :request=
 
-    def initialize(mutex, condition_variable, response: :authorize, &block)
+    def initialize(mutex, condition_variable, response: :authorize, config: nil, &block)
+      config ||= Apptokit.config
       @mutex, @condition_variable = mutex, condition_variable
-      @port = Apptokit.config.oauth_callback_port.nil? ? 8075 : Apptokit.config.oauth_callback_port
-      @bind = Apptokit.config.oauth_callback_bind || 'localhost'
-      @path = Apptokit.config.oauth_callback_path || '/callback'
-      @hostname = Apptokit.config.oauth_callback_hostname || 'localhost'
+      @port = config.oauth_callback_port.nil? ? 8075 : config.oauth_callback_port
+      @bind = config.oauth_callback_bind || 'localhost'
+      @path = config.oauth_callback_path || '/callback'
+      @hostname = config.oauth_callback_hostname || 'localhost'
       @response = response
 
       @killed = false

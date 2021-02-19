@@ -36,17 +36,20 @@ function install {
   }
 
   PROJECT_GIT_URL="https://github.com/jakewilkins/apptokit.git"
-  TAG="main"
+  TAG="env_refactor"
   LIB_MOVES=("completions" "libexec" "share" "LICENSE")
   CLONE_DIR="./.apptokit-temp_clone"
 
-  git clone --depth=1 $PROJECT_GIT_URL $CLONE_DIR
+  [ -d "$CLONE_DIR" ] && rm -rf "$CLONE_DIR"
+
+  git clone $PROJECT_GIT_URL $CLONE_DIR
 
   mkdir -pv $LIB_DIR
   mkdir -pv $BIN_DIR
   mkdir -pv $LIB_DIR/bin
 
   pushd $CLONE_DIR
+  git fetch origin $TAG
   git checkout $TAG
 
   for move in "${LIB_MOVES[@]}"; do

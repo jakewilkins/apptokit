@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'apptokit/jwt'
-require 'net/http'
 require 'json'
 
 require "apptokit/key_cache"
@@ -50,15 +49,9 @@ module Apptokit
     end
 
     def perform_generation
-      uri = URI(installation_token_url)
-      request = Net::HTTP::Post.new(uri)
-      request["User-Agent"] = (ENV["USER_AGENT"] || "Apptokit")
-      request["Accept"] = "application/vnd.github.machine-man-preview+json"
-      request["Authorization"] = jwt.header
+      raise ApptokitError, "An Installation ID is required for generating an Installation Token" unless installation_id
 
-      response = Net::HTTP.start(uri.hostname, uri.port, nil, nil, nil, nil, use_ssl: uri.scheme == "https") do |http|
-        http.request(request)
-      end
+      response = HTTP.post("/app/installations/#{installation_id}/access_tokens", auth: jwt.header)
 
       case response
       when Net::HTTPSuccess then
@@ -66,15 +59,9 @@ module Apptokit
         self.token      = hash["token"]
         self.expires_at = hash["expires_at"]
       when Net::HTTPNotFound
-        if Apptokit.config.env_from_manifest?
-          Apptokit.config.clear_manifest_cache!
-          $stderr.puts "The cached manifest information is no longer valid, we removed it."
-          $stderr.puts "Please try this command again"
-          exit 16
-        else
-          $stderr.puts "The installation token you provided is innaccessible, please verify it"
-          exit 15
-        end
+        $stderr.puts "The installation ID you provided is innaccessible, please verify it"
+        $stderr.puts "If this App is managed via 'apptokit manifest' you can create an installation with 'apptokit manifest install'"
+        exit 15
       else
         raise ApptokitError, "Could not create an Installation Token: #{response.code}\n\n#{response.body}"
       end
@@ -87,10 +74,6 @@ module Apptokit
 
     def jwt
       @jwt ||= JWT.generate
-    end
-
-    def installation_token_url
-      URI("#{Apptokit.config.github_api_url}/app/installations/#{installation_id}/access_tokens")
     end
   end
 end
