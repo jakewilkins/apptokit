@@ -26,7 +26,8 @@ export PATH="${libexec_path}:$PATH"
 export APPTOKIT_RUBY_SHARE_PATH="$_APPTOKIT_ROOT/share/ruby"
 export APPTOKIT_RUBY_VENDOR_PATH="$_APPTOKIT_ROOT/share/ruby/vendor"
 
-export GEM_PATH="${APPTOKIT_RUBY_VENDOR_PATH}/ruby/2.4.0:${GEM_PATH}"
+ruby_version_major=$(ruby --disable-gems -e "print RUBY_VERSION.split('.').tap {|a| a[2] = '0'}.join('.')")
+export GEM_PATH="${APPTOKIT_RUBY_VENDOR_PATH}/ruby/${ruby_version_major}:${GEM_PATH}"
 export RUBYLIB="$APPTOKIT_RUBY_SHARE_PATH"
 
 command="$1"
