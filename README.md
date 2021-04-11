@@ -43,9 +43,9 @@ This will install `apptokit` into `/usr/local` and generate a comment-filled
 If you're interested in `apptokit` having autocomplete follow the instructions in
 the output from the install script.
 
-Apptokit uses environments to work with multiple GitHub Apps, so you can have a
-development app for testing new permissions and also a client configured for
-debugging your production app.
+Apptokit uses environments to work with multiple GitHub Apps, so you can have an
+environment configured for a development app for testing new permissions and also
+an environment configured for debugging your production app.
 
 ### Quick start
 
