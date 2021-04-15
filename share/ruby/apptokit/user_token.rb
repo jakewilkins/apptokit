@@ -162,9 +162,9 @@ module Apptokit
         Hash[URI.decode_www_form(res.body)]
       when Net::HTTPRedirection
         Apptokit.config.debug do
-          p headers
-          p uri, body
+          p res, res.uri, body
           puts "Redirected to #{res['Location']}"
+          puts res.each.map { |h, k| "#{h} => #{k}" }.join("\n")
         end
         raise ApptokitError, "Redirected during token create, possibly a cookie issue? Location: #{res['Location']}"
       else
