@@ -19,4 +19,4 @@ else
 fi
 echo "Fingerprinting path $path"
 
-openssl rsa -in $path -pubout -outform DER | openssl sha1 -c
+openssl rsa -in $path -pubout -outform DER 2>/dev/null | openssl sha1 -c
