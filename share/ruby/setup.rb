@@ -40,13 +40,13 @@ module Apptokit
       `$BROWSER #{url}`
     else
       if prompt
-        puts prompt
+        $stderr.puts prompt
       else
-        puts "Please open the following URL in your browser:"
+        $stderr.puts "Please open the following URL in your browser:"
       end
-      puts
-      puts url
-      puts
+      $stderr.puts
+      $stderr.puts url
+      $stderr.puts
     end
   end
 
