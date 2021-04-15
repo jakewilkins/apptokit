@@ -62,10 +62,13 @@ module Apptokit
       default_headers = {}
       default_headers["User-Agent"]    = config.user_agent if config.user_agent
       default_headers["Authorization"] = auth if auth
-      default_headers["Cookies"]       = config.cookie if config.cookie
+      default_headers["Cookie"]        = config.cookie if config.cookie
       default_headers["Accept"]        = config.accept_header || "application/json"
 
       headers = default_headers.merge(additional_headers)
+      Apptokit.config.debug do
+        puts "Building #{klass} request to URI #{uri} with headers #{headers}"
+      end
 
       headers.each do |key, value|
         req[key] = value
