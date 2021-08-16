@@ -1,0 +1,14 @@
+{
+    "forwardPorts": [8075, 8875],
+    "portsAttributes": {
+        "8075": {
+            "label": "OAuth Callback URL",
+            "onAutoForward": "notify"
+        },
+        "8875": {
+            "label": "Manifest Callback URL",
+            "onAutoForward": "notify"
+        }
+    },
+    "postCreateCommand": ["bash", "install.sh", "install", "--i-have-read-this-script"],
+}
