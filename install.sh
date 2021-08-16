@@ -63,7 +63,9 @@ function install {
   ln -vs $LIB_DIR/libexec/$APP $BIN_DIR/$APP
   # FIXME - this link is kind of gross - but I'm leaving it so that
   # apptokit shell-setup works without changes.
-  ln -vs $LIB_DIR/libexec/$APP $LIB_DIR/bin/$APP
+  local ruby_version_major=$(ruby --disable-gems -e "print RUBY_VERSION.split('.').tap {|a| a[2] = '0'}.join('.')")
+  GEM_PATH="$LIB_DIR/share/ruby/vendor/ruby/${ruby_version_major}:${GEM_PATH}"
+  gem install jwt 1>/dev/null
 
   echo "Generating global config file unless you have one..."
   $BIN_DIR/$APP init initial-setup
