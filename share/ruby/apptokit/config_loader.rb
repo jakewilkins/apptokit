@@ -96,6 +96,13 @@ module Apptokit
       @env ||= ENV["APPTOKIT_ENV"] || ENV["GH_ENV"] || read_from_env("default_env") || @default_env
     end
 
+    def oauth_callback_hostname
+      return config['oauth_callback_hostname'] if config.key?('oauth_callback_hostname')
+      return 'localhost' unless ENV['CODESPACES']
+      
+      "#{ENV['CODESPACE_NAME']}.github.dev"
+    end
+
     def env_from_manifest?
       config.key?('manifest_url') || config.key?('manifest')
     end
