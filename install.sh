@@ -39,33 +39,61 @@ function install {
   TAG="main"
   LIB_MOVES=("completions" "libexec" "share" "LICENSE")
   CLONE_DIR="./.apptokit-temp_clone"
+  USE_SUDO=""
 
   [ -d "$CLONE_DIR" ] && rm -rf "$CLONE_DIR"
 
-  git clone $PROJECT_GIT_URL $CLONE_DIR
+  local use_local_copy=false
 
-  mkdir -pv $LIB_DIR
+  if [ $CODESPACES ]; then
+    remote_url=$(git remote get-url origin)
+    if [[ "$remote_url.git" == "$PROJECT_GIT_URL" ]]; then
+      use_local_copy=true
+      LIB_DIR="$(pwd)"
+      USE_SUDO="sudo"
+    fi
+  else
+    set +e
+    touch "$BIN_DIR/testing-writeability-for-apptokit"
+    if [ "$?" != "0" ]; then
+      echo "'$BIN_DIR' is not writable as this user, please enter your password so we may use 'sudo' to write files:"
+      sudo echo "Thanks!"
+    else
+      rm "$BIN_DIR/testing-writeability-for-apptokit"
+    fi
+    set -e
+  fi
+
   mkdir -pv $BIN_DIR
-  mkdir -pv $LIB_DIR/bin
 
-  pushd $CLONE_DIR
-  git fetch origin $TAG
-  git checkout $TAG
+  if [ ! $use_local_copy ]; then
+    git clone $PROJECT_GIT_URL $CLONE_DIR
 
-  for move in "${LIB_MOVES[@]}"; do
-    mv -v "$move" "$LIB_DIR/$move"
-  done
+    mkdir -pv $LIB_DIR
+    mkdir -pv $LIB_DIR/bin
 
-  popd
+    pushd $CLONE_DIR
+    git fetch origin $TAG
+    git checkout $TAG
 
-  [ -d "$CLONE_DIR" ] && rm -rf "$CLONE_DIR" 1>/dev/null
+    for move in "${LIB_MOVES[@]}"; do
+      mv -v "$move" "$LIB_DIR/$move"
+    done
 
-  ln -vs $LIB_DIR/libexec/$APP $BIN_DIR/$APP
-  # FIXME - this link is kind of gross - but I'm leaving it so that
-  # apptokit shell-setup works without changes.
+    popd
+
+    [ -d "$CLONE_DIR" ] && rm -rf "$CLONE_DIR" 1>/dev/null
+
+    # FIXME - this link is kind of gross - but I'm leaving it so that
+    # apptokit shell-setup works without changes.
+    $USE_SUDO ln -vs $LIB_DIR/libexec/$APP $LIB_DIR/bin/$APP
+  fi
+
   local ruby_version_major=$(ruby --disable-gems -e "print RUBY_VERSION.split('.').tap {|a| a[2] = '0'}.join('.')")
   GEM_PATH="$LIB_DIR/share/ruby/vendor/ruby/${ruby_version_major}:${GEM_PATH}"
   gem install jwt 1>/dev/null
+
+  [ ! -f $BIN_DIR/$APP ] && $USE_SUDO ln -vs $LIB_DIR/libexec/$APP $BIN_DIR/$APP
 
   echo "Generating global config file unless you have one..."
   $BIN_DIR/$APP init initial-setup
@@ -75,7 +103,6 @@ function install {
   echo
   echo "If /usr/bin is not in your \$PATH or you'd like tab completions, follow instructions below."
   echo
-
 
   $BIN_DIR/$APP shell-setup
 }
