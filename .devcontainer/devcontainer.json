@@ -8,6 +8,10 @@
         "8875": {
             "label": "Manifest Callback URL",
             "onAutoForward": "notify"
+        },
+        "8878": {
+            "label": "Manifest Template Callback URL",
+            "onAutoForward": "notify"
         }
     },
     "postCreateCommand": ["bash", "install.sh", "install", "--i-have-read-this-script"],
