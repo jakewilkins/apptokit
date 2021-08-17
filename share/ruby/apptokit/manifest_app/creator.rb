@@ -33,6 +33,13 @@ module Apptokit
 
       def walk_user_through_creation_flow
         template_mutex, template_condition = Mutex.new, ConditionVariable.new
+        
+        # We need this built so we can use callback_server.callback_url when building the App Manifest
+        callback_server = CallbackServer.new(mutex, condition_variable, response: :manifest, config: config) do |server|
+          server.port = 8875
+          server.path = "/manifest_callback"
+        end
+        @created_callback_url = callback_server.callback_url
         manifest_result = FORM_TEMPLATE.result(binding)
         manifest_server = CallbackServer.new(template_mutex, template_condition) do |server|
           server.response = manifest_result
@@ -40,11 +47,6 @@ module Apptokit
           server.path = ""
         end
         manifest_server.start
-
-        callback_server = CallbackServer.new(mutex, condition_variable, response: :manifest, config: config) do |server|
-          server.port = 8875
-          server.path = "/manifest_callback"
-        end
         callback_server.start
 
         Apptokit.open(
@@ -101,7 +103,7 @@ module Apptokit
       end
 
       def callback_server_url
-        "http://localhost:8875/manifest_callback"
+        @created_callback_url || "http://localhost:8875/manifest_callback"
       end
 
       def yaml_manifest

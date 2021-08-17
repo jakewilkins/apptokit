@@ -97,8 +97,14 @@ module Apptokit
     end
 
     def callback_url
+      return codespaces_callback_url if Apptokit.config.codespaces?
+
       port_part = port ? ":#{port}" : ""
       "http://#{hostname}#{port_part}/#{path}"
+    end
+
+    def codespaces_callback_url
+      "https://#{ENV['CODESPACE_NAME']}-#{port}.githubpreview.dev/#{path}"
     end
 
     def oauth_code
