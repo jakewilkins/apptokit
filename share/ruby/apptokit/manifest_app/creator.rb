@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
-# require 'net/http'
 require 'erb'
-require 'tempfile'
 
 require 'apptokit/jwt'
 require 'apptokit/callback_server'
@@ -34,9 +32,14 @@ module Apptokit
       end
 
       def walk_user_through_creation_flow
-        tempfile = Tempfile.new(["app_manifest", ".html"])
-        tempfile.write(FORM_TEMPLATE.result(binding))
-        tempfile.flush
+        template_mutex, template_condition = Mutex.new, ConditionVariable.new
+        manifest_result = FORM_TEMPLATE.result(binding)
+        manifest_server = CallbackServer.new(template_mutex, template_condition) do |server|
+          server.response = manifest_result
+          server.port = 8878
+          server.path = ""
+        end
+        manifest_server.start
 
         callback_server = CallbackServer.new(mutex, condition_variable, response: :manifest, config: config) do |server|
           server.port = 8875
@@ -45,12 +48,13 @@ module Apptokit
         callback_server.start
 
         Apptokit.open(
-          tempfile.path,
+          manifest_server.callback_url,
           prompt: "Please open the link below to continue creating the application:"
         )
 
         mutex.synchronize { condition_variable.wait(mutex, 60) }
         callback_server.shutdown
+        manifest_server.shutdown
 
         if callback_server.killed?
           $stderr.puts "Aborting manifest setup process, the App will not be created."
@@ -65,11 +69,6 @@ module Apptokit
         end
 
         self.code = callback_server.code
-      ensure
-        if tempfile
-          tempfile.close
-          tempfile.unlink
-        end
       end
 
       def exchange_code_for_app_settings
