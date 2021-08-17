@@ -138,6 +138,10 @@ module Apptokit
       @keycache_file_path ||= ConfigLoader::HOME_DIR_CONF_DIR.join(".apptokit_#{env || 'global'}_keycache")
     end
 
+    def codespaces?
+      ENV['CODESPACES'] == 'true'
+    end
+
     def debug(msg = nil, &block)
       return unless debug?
       return block.call if block
