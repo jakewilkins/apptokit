@@ -10,7 +10,7 @@ Layout/HashAlignment:
   EnforcedHashRocketStyle: table
 
 Metrics/MethodLength:
-  Max: 31
+  Max: 32
   Exclude:
     - test/*
 Metrics/ClassLength:
