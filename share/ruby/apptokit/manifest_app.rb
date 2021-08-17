@@ -60,7 +60,7 @@ module Apptokit
     def convert_to_apptokit_opts(raw_manifest)
       key = begin
         OpenSSL::PKey::RSA.new(raw_manifest["pem"])
-      rescue OpenSSL::PKey::RSAError # rubocop:disable Layout/RescueEnsureAlignment
+      rescue OpenSSL::PKey::RSAError
         :unavailable
       end
       hash = {

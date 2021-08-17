@@ -11,8 +11,8 @@ module Apptokit
       new(installation_id: installation_id, skip_cache: skip_cache).tap(&:generate)
     end
 
-    attr_reader :installation_id, :token, :expires_at, :skip_cache, :cached
-    attr_writer :token, :expires_at, :cached
+    attr_accessor :token, :expires_at, :cached
+    attr_reader :installation_id, :skip_cache
     private :token=, :expires_at=, :cached=
 
     def initialize(installation_id: nil, skip_cache: false)
@@ -54,7 +54,7 @@ module Apptokit
       response = HTTP.post("/app/installations/#{installation_id}/access_tokens", auth: jwt.header)
 
       case response
-      when Net::HTTPSuccess then
+      when Net::HTTPSuccess
         hash = JSON.parse(response.body)
         self.token      = hash["token"]
         self.expires_at = hash["expires_at"]

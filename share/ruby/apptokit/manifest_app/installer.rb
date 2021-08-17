@@ -43,9 +43,8 @@ module Apptokit
 
         case response
         when Net::HTTPSuccess
-          parsed = JSON.parse(response.body)
+          JSON.parse(response.body)
 
-          parsed
         else
           sleep 0.1
 

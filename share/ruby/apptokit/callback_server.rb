@@ -78,8 +78,8 @@ module Apptokit
     </html
     HTML
 
-    attr_reader :mutex, :condition_variable, :thread, :request, :server, :port, :bind, :path, :hostname
-    attr_writer :request, :port, :bind, :path, :hostname
+    attr_accessor :request, :port, :bind, :path, :hostname
+    attr_reader :mutex, :condition_variable, :thread, :server
     private :mutex, :condition_variable, :thread, :request, :request=
 
     def initialize(mutex, condition_variable, response: :authorize, config: nil, &block)

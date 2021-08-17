@@ -99,7 +99,7 @@ module Apptokit
     def oauth_callback_hostname
       return config['oauth_callback_hostname'] if config.key?('oauth_callback_hostname')
       return 'localhost' unless ENV['CODESPACES']
-      
+
       "#{ENV['CODESPACE_NAME']}.github.dev"
     end
 
@@ -126,7 +126,7 @@ module Apptokit
         "APPTOKIT_#{opt.upcase}=#{value}"
       end.compact
       values << "APPTOKIT_LOADED_ENV=#{env}" unless env_from_manifest? && @manifest_data == :unavailable
-      values << "APPTOKIT_PRIVATE_KEY=\"#{@manifest_data['pem'].gsub("\n", "|")}\"" if env_from_manifest? && @manifest_data != :unavailable
+      values << "APPTOKIT_PRIVATE_KEY=\"#{@manifest_data['pem'].gsub("\n", '|')}\"" if env_from_manifest? && @manifest_data != :unavailable
       values << "APPTOKIT_DEFAULT_ENV=#{@default_env}" if @default_env
       values.join("\n")
     end
@@ -183,9 +183,9 @@ module Apptokit
         out[opt] = value
       end)
 
-      if ENV.key?("APPTOKIT_PRIVATE_KEY")
-        config["private_key"] = OpenSSL::PKey::RSA.new(ENV["APPTOKIT_PRIVATE_KEY"].gsub("|", "\n").gsub('"', ""))
-      end
+      return unless ENV.key?("APPTOKIT_PRIVATE_KEY")
+
+      config["private_key"] = OpenSSL::PKey::RSA.new(ENV["APPTOKIT_PRIVATE_KEY"].gsub("|", "\n").gsub('"', ""))
     end
 
     def read_from_env(name)

@@ -89,7 +89,7 @@ module Apptokit
         raise ApptokitError, "Private key path not set but required for using a private key." unless private_key_path && !private_key_path.to_s.empty?
 
         OpenSSL::PKey::RSA.new(File.read(private_key_path))
-      rescue OpenSSL::PKey::RSAError # rubocop:disable Layout/RescueEnsureAlignment
+      rescue OpenSSL::PKey::RSAError
         :unavailable
       end
     end

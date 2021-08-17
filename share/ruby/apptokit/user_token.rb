@@ -151,7 +151,8 @@ module Apptokit
       }
       body["grant_type"] = "refresh_token" if refresh
 
-      res = HTTP.post("/login/oauth/access_token",
+      res = HTTP.post(
+        "/login/oauth/access_token",
         body: URI.encode_www_form(body),
         headers: { "Content-Type" => "application/x-www-form-urlencoded", "Accept" => "*/*" },
         type: :dotcom

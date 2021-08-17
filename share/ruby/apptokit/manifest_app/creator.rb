@@ -14,8 +14,8 @@ module Apptokit
         Configuration::SHARE_DIR.join("create_manifest_app.html.erb").read
       )
 
-      attr_reader :config, :mutex, :condition_variable, :auto_open, :code, :skip_cache
-      attr_writer :code
+      attr_accessor :code
+      attr_reader :config, :mutex, :condition_variable, :auto_open, :skip_cache
       private :code=
 
       def initialize(config:, auto_open: nil, code: nil, skip_cache: false)
