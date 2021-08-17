@@ -78,7 +78,7 @@ module Apptokit
     </html
     HTML
 
-    attr_accessor :request, :port, :bind, :path, :hostname
+    attr_accessor :request, :port, :bind, :path, :hostname, :response
     attr_reader :mutex, :condition_variable, :thread, :server
     private :mutex, :condition_variable, :thread, :request, :request=
 
@@ -142,6 +142,10 @@ module Apptokit
         AUTHORIZE_RESPONSE_BODY
       when :manifest
         MANIFEST_RESPONSE_BODY
+      when String
+        @response
+      else
+        "lol whoops"
       end
     end
 
