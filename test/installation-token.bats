@@ -17,7 +17,7 @@ function teardown {
     echo "$output" >&2
   fi
   [ "$status" -eq 0 ]
-  [[ "$output" == "token v1."* ]]
+  [[ "$output" == "token ghs_"* ]]
 }
 
 @test "uses cached result if available" {
@@ -31,7 +31,7 @@ function teardown {
     echo "$output" >&2
   fi
   [ "$status" -eq 0 ]
-  [[ "$output" == "token v1."* ]]
+  [[ "$output" == "token ghs_"* ]]
 
   run $APPTOKIT installation-token
 
@@ -39,7 +39,7 @@ function teardown {
     echo "$output" >&2
   fi
   [ "$status" -eq 0 ]
-  [[ "$output" == "token v1."* ]]
+  [[ "$output" == "token ghs_"* ]]
   [ "$first_token" = "$output" ]
 }
 
@@ -54,7 +54,7 @@ function teardown {
     echo "$output" >&2
   fi
   [ "$status" -eq 0 ]
-  [[ "$output" == "token v1."* ]]
+  [[ "$output" == "token ghs_"* ]]
 
   run $APPTOKIT installation-token --force
 
@@ -62,7 +62,7 @@ function teardown {
     echo "$output" >&2
   fi
   [ "$status" -eq 0 ]
-  [[ "$output" == "token v1."* ]]
+  [[ "$output" == "token ghs_"* ]]
   [ "$first_token" != "$output" ]
 }
 
