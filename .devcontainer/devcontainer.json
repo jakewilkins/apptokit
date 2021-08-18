@@ -1,16 +1,20 @@
 {
-    "forwardPorts": [8075, 8875, 8878],
+    "forwardPorts": [8075, 8875, 8878, 8077],
     "portsAttributes": {
         "8075": {
-            "label": "OAuth Callback URL",
+            "label": "OAuth Callback",
             "onAutoForward": "notify"
         },
         "8875": {
-            "label": "Manifest Callback URL",
+            "label": "Manifest Callback",
             "onAutoForward": "notify"
         },
         "8878": {
-            "label": "Manifest Template Callback URL",
+            "label": "Manifest Template Callback",
+            "onAutoForward": "notify"
+        },
+        "8077": {
+            "label": "Webhook Receiver",
             "onAutoForward": "notify"
         }
     },
