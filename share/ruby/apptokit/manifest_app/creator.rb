@@ -33,7 +33,7 @@ module Apptokit
 
       def walk_user_through_creation_flow
         template_mutex, template_condition = Mutex.new, ConditionVariable.new
-        
+
         # We need this built so we can use callback_server.callback_url when building the App Manifest
         callback_server = CallbackServer.new(mutex, condition_variable, response: :manifest, config: config) do |server|
           server.port = 8875

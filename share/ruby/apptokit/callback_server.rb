@@ -78,7 +78,8 @@ module Apptokit
     </html
     HTML
 
-    attr_accessor :request, :port, :bind, :path, :hostname, :response
+    attr_accessor :request, :port, :bind, :path, :hostname
+    attr_writer :response
     attr_reader :mutex, :condition_variable, :thread, :server
     private :mutex, :condition_variable, :thread, :request, :request=
 
