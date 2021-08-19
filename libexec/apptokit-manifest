@@ -77,12 +77,20 @@ when "setup"
   install(config_loader)
   exit Apptokit::RELOAD_ENV_EXIT_CODE
 when "show"
-  puts "Manifest for env: #{config_loader.env}"
-  unless manifest == :unavailable
-    pp manifest
+  if $stdout.isatty
+    puts "Manifest for env: #{config_loader.env}"
+    unless manifest == :unavailable
+      pp manifest
+    else
+      puts "Manifest App not created, configured with"
+      pp config_loader.fetch('manifest')
+    end
   else
-    puts "Manifest App not created, configured with"
-    pp config_loader.fetch('manifest')
+    if manifest == :unavailable
+      puts({status: :unavailable}.to_json)
+    else
+      puts manifest.to_json
+    end
   end
 when "edit"
   puts "Editing manifest for env: #{config_loader.env}"
