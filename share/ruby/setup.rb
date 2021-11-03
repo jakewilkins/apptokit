@@ -6,6 +6,8 @@ require 'yaml'
 require 'uri'
 
 module Apptokit
+  autoload :JWT, "apptokit/jwt"
+
   VERSION = '0.1.0'
 
   RELOAD_ENV_EXIT_CODE = 234

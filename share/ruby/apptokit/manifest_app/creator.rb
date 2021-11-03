@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 require 'erb'
-
-require 'apptokit/jwt'
 require 'apptokit/callback_server'
 
 module Apptokit
