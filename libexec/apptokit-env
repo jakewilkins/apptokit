@@ -61,7 +61,15 @@ end
 
 edit_envs = (%w(--edit -e) & ARGV).any?
 list_envs = (%w(--list -l list) & ARGV).any?
+web_settings = (%w(--settings -s settings) & ARGV).any?
 show_envs = ARGV & Apptokit::ConfigLoader.environments
+
+if web_settings
+  conf = Apptokit.config
+  url = "#{conf.github_url}/settings/apps/#{conf.env}"
+  Apptokit.open(url)
+  exit
+end
 
 if $stdout.isatty
   if edit_envs
