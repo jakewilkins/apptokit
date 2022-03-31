@@ -13,7 +13,7 @@ function install {
     exit 1
   }
 
-  command -v brew >/dev/null 2>&1 || { 
+  command -v brew >/dev/null 2>&1 || {
     command -v git >/dev/null 2>&1 || {
       echo >&2 "apptokit requires git but it's not installed, and brew is not installed to install it.  Aborting."
       echo >&2 "For help installing homebrew, visit https://brew.sh"
@@ -24,7 +24,7 @@ function install {
   command -v git >/dev/null 2>&1 || {
     echo >&2 "apptokit requires git, install it using Homebrew?"
     read -rp "Continue (y/n)?" choice
-    case "$choice" in 
+    case "$choice" in
       y|Y )
         brew install git
       ;;
@@ -66,7 +66,7 @@ function install {
 
   mkdir -pv $BIN_DIR
 
-  if [ ! $use_local_copy ]; then
+  if [ !$use_local_copy ]; then
     git clone $PROJECT_GIT_URL $CLONE_DIR
 
     mkdir -pv $LIB_DIR
@@ -90,7 +90,8 @@ function install {
   fi
 
   local ruby_version_major=$(ruby --disable-gems -e "print RUBY_VERSION.split('.').tap {|a| a[2] = '0'}.join('.')")
-  GEM_PATH="$LIB_DIR/share/ruby/vendor/ruby/${ruby_version_major}:${GEM_PATH}"
+  export GEM_PATH="$LIB_DIR/share/ruby/vendor/ruby/${ruby_version_major}:${GEM_PATH}"
+  export GEM_HOME="$LIB_DIR/share/ruby/vendor/ruby/${ruby_version_major}"
   gem install jwt 1>/dev/null
 
   [ ! -f $BIN_DIR/$APP ] && $USE_SUDO ln -vs $LIB_DIR/libexec/$APP $BIN_DIR/$APP
@@ -118,7 +119,6 @@ function uninstall {
   echo "to fully complete uninstallation please remove the shell-setup commands from your ${shell_name}rc"
   echo
 
-  
   [ -d "$LIB_DIR" ] && { echo "removing $LIB_DIR"; rm -r "$LIB_DIR" > /dev/null; }
   [ -L "$BIN_DIR/$APP" ] && { echo "removing $BIN_DIR/$APP"; rm "$BIN_DIR/$APP" > /dev/null; }
   set +e
