@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html>
   <head>
     <title>Create a GitHub App</title>
@@ -26,7 +27,11 @@
   <body>
     <div id="outer">
       <div id="inner">
-        <form action="<%= manifest_flow_start_url %>" method="post">
+        <label for="app-owner">Enter the organization name that will own the App (leave blank for the logged in user)</label>
+        <br />
+        <input type="text" name="app-owner" id="app-owner" placeholder="organization name">
+        <hr>
+        <form id="manifest-create-form" action="<%= manifest_flow_start_url %>" method="post">
           Create a GitHub App from the following manifest:
           <textarea name="manifest" id="manifest" value="<%= manifest_json %>" hidden></textarea>
           <br>
@@ -37,8 +42,25 @@
     </div>
 
 		<script>
-		 input = document.getElementById("manifest");
-		 input.value = JSON.stringify(<%= manifest_json %>);
+		  input = document.getElementById("manifest");
+		  input.value = JSON.stringify(<%= manifest_json %>);
+
+      appOwnerInput = document.getElementById("app-owner");
+
+      function updateManifestFormTargetUrl(appOwner) {
+        tld = "<%= config.github_url %>";
+        manifestForm = document.getElementById("manifest-create-form");
+        if (appOwner == "") {
+          targetUrl = tld + "/settings/apps/new";
+        } else {
+          targetUrl = tld + "/organizations/" + appOwner + "/settings/apps/new";
+        }
+        manifestForm.action = targetUrl;
+      };
+
+      appOwnerInput.addEventListener("input", (event) => {
+        updateManifestFormTargetUrl(event.target.value);
+      });
 		</script>
   </body>
 </html>
