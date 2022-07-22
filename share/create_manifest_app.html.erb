@@ -29,7 +29,7 @@
       <div id="inner">
         <label for="app-owner">Enter the organization name that will own the App (leave blank for the logged in user)</label>
         <br />
-        <input type="text" name="app-owner" id="app-owner" placeholder="organization name">
+        <input type="text" name="app-owner" id="app-owner" placeholder="organization name" value="<%= config.app_owner %>">
         <hr>
         <form id="manifest-create-form" action="<%= manifest_flow_start_url %>" method="post">
           Create a GitHub App from the following manifest:
