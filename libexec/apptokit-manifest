@@ -66,13 +66,25 @@ def install(config_loader)
   puts "#{config_loader.env} installed, installation id: #{installation_id}"
 end
 
+def check_for_no_auto_open_arg
+  if (ARGV & %w(-n --no-auto-open)).any?
+    Apptokit.disable_auto_open!
+  end
+end
+
 case ARGV.shift
 when "create"
+  check_for_no_auto_open_arg
+
   create(manifest, config_loader)
 when "install"
+  check_for_no_auto_open_arg
+
   install(config_loader)
   exit Apptokit::RELOAD_ENV_EXIT_CODE
 when "setup"
+  check_for_no_auto_open_arg
+
   create(manifest, config_loader)
   install(config_loader)
   exit Apptokit::RELOAD_ENV_EXIT_CODE
