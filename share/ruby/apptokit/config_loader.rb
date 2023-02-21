@@ -14,7 +14,7 @@ module Apptokit
     def self.environments
       envs = []
       [HOME_DIR_CONF_PATH, PROJECT_DIR_CONF_PATH].each do |path|
-        envs += (YAML.load_file(path).keys - Apptokit::Configuration::YAML_OPTS) if path.exist?
+        envs += (YAML.safe_load(path, aliases: true).keys - Apptokit::Configuration::YAML_OPTS) if path.exist?
       end
       (envs - %w(default_env)).reject { |e| /_defaults/.match?(e) }
     end
