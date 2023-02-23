@@ -99,7 +99,7 @@ end
 if env
   env_template = Apptokit::Configuration::SHARE_DIR.join("apptokit-env-template.yml")
   if existing
-    existing_conf = YAML.load_file(yaml_path)
+    existing_conf = YAML.load_file(yaml_path, aliases: true)
     if existing_conf.key?(env)
       warn "WARNING: duplicate env '#{env}', this configuration will replace previously existing '#{env}' env when parsed by YAML."
     end
