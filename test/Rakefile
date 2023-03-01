@@ -5,12 +5,20 @@ task :env do |t|
   system("./test/setup.sh")
 end
 
-vendor_dir = File.join(File.dirname(File.dirname(__FILE__)), "share/ruby/vendor")
-ENV['GEM_PATH']="#{vendor_dir}/ruby/2.4.0:#{ENV['GEM_PATH']}"
+current_dir = File.basename(Dir.pwd)
+in_ci_build_dir = current_dir == ENV["RUBY_VERSION"]
+in_test_dir = current_dir == "test"
+
+path_prefix = if in_ci_build_dir || in_test_dir
+  "../"
+else
+  ""
+end
+
 Rake::TestTask.new(test: :env) do |t|
-  t.libs << "test"
-  t.libs << "share/ruby"
-  t.test_files = FileList['test/**/*_test.rb']
+  t.libs << "#{path_prefix}test"
+  t.libs << "#{path_prefix}share/ruby"
+  t.test_files = FileList["#{path_prefix}test/*_test.rb"]
 end
 
 task default: :test

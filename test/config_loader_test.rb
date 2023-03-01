@@ -16,7 +16,7 @@ class ConfigLoaderTest < TestCase
   end
 
   def test_loads_conf_from_project_dir
-    write_local_config('user_agent' => 'test')
+    write_local_config({'user_agent' => 'test'})
 
     @loader.reload!
 
@@ -26,7 +26,7 @@ class ConfigLoaderTest < TestCase
   end
 
   def test_loads_conf_from_env
-    write_local_config('user_agent' => 'test', 'client_id' => '1')
+    write_local_config({'user_agent' => 'test', 'client_id' => '1'})
     ENV['APPTOKIT_USER_AGENT'] = 'foobar'
 
     @loader.reload!
@@ -44,7 +44,7 @@ class ConfigLoaderTest < TestCase
     manifest_apps_dir.mkpath unless manifest_apps_dir.exist?
     path = manifest_apps_dir.join('bats.yml')
     FileUtils.cp(TEST_DIR.join("manifest-app-env.yml"), path)
-    write_local_config('manifest' => {'default_permissions' => {'issues' => 'read'}})
+    write_local_config({'manifest' => {'default_permissions' => {'issues' => 'read'}}})
 
     @loader.reload!
 
