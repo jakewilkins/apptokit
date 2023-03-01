@@ -16,7 +16,7 @@ jobs:
     - name: Set up Ruby ${{ matrix.ruby }}
       uses: actions/setup-ruby@v1
       with:
-        ruby-version: ${{ matrix.ruby }}
+        ruby-version: ${{ matrix.ruby-version }}
     - name: Run tests
       env:
         BATS_APP_ID:  ${{ secrets.BATS_APP_ID }}
