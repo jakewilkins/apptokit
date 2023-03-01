@@ -35,7 +35,7 @@ function install {
     esac
   }
 
-  PROJECT_GIT_URL="https://github.com/jakewilkins/apptokit.git"
+  PROJECT_GIT_URL="https://github.com/jakewilkins/apptokit"
   TAG="main"
   LIB_MOVES=("completions" "libexec" "share" "LICENSE")
   CLONE_DIR="./.apptokit-temp_clone"
@@ -47,7 +47,7 @@ function install {
 
   if [ $CODESPACES ]; then
     remote_url=$(git remote get-url origin)
-    if [[ "$remote_url.git" == "$PROJECT_GIT_URL" ]]; then
+    if [[ "$remote_url" == "$PROJECT_GIT_URL" ]]; then
       use_local_copy=true
       LIB_DIR="$(pwd)"
       USE_SUDO="sudo"
@@ -64,20 +64,20 @@ function install {
     set -e
   fi
 
-  mkdir -pv $BIN_DIR
+  $USE_SUDO mkdir -pv $BIN_DIR
 
-  if [ !$use_local_copy ]; then
+  if [[ "$use_local_copy" == "false" ]]; then
     git clone $PROJECT_GIT_URL $CLONE_DIR
 
-    mkdir -pv $LIB_DIR
-    mkdir -pv $LIB_DIR/bin
+    $USE_SUDO mkdir -pv $LIB_DIR
+    $USE_SUDO mkdir -pv $LIB_DIR/bin
 
     pushd $CLONE_DIR
     git fetch origin $TAG
     git checkout $TAG
 
     for move in "${LIB_MOVES[@]}"; do
-      mv -v "$move" "$LIB_DIR/$move"
+      $USE_SUDO mv -v "$move" "$LIB_DIR/$move"
     done
 
     popd
