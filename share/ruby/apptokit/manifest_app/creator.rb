@@ -109,7 +109,7 @@ module Apptokit
 
         if !config.manifest_url && !config.manifest
           raise ApptokitError.new(
-            "The current environment does not provide a manifest configuration"
+            "The current environment does not provide a manifest configuration",
             type: :manifest_not_a_manifest
           )
         end
