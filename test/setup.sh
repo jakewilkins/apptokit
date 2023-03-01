@@ -1,6 +1,12 @@
-
+#!/bin/bash
 
 mkdir -p ~/.config/apptokit
+
+this_dir=`basename $(pwd)`
+
+if [[ "$this_dir" != "apptokit" ]]; then
+	pushd ..
+fi
 
 [ -f "./.apptokit.yml" ] && rm .apptokit.yml
 eval "echo \"$(cat test/env.yml)\"" > ./.apptokit.yml
@@ -15,3 +21,8 @@ gem install webrick
 if [ ! -d $GEM_PATH ]; then
   gem install jwt 2>&1 1>/dev/null
 fi
+
+if [[ "$this_dir" != "apptokit" ]]; then
+	popd
+fi
+
