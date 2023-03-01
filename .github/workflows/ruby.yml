@@ -14,7 +14,7 @@ jobs:
     steps:
     - uses: actions/checkout@master
     - name: Set up Ruby ${{ matrix.ruby }}
-      uses: actions/setup-ruby@v1
+      uses: ruby/setup-ruby@v1
       with:
         ruby-version: ${{ matrix.ruby-version }}
     - name: Run tests
@@ -24,7 +24,7 @@ jobs:
         BATS_CLIENT_ID:  ${{ secrets.BATS_CLIENT_ID }}
         BATS_CLIENT_SECRET:  ${{ secrets.BATS_CLIENT_SECRET }}
         BATS_PRIVATE_KEY:  ${{ secrets.BATS_PRIVATE_KEY }}
-        RUBY_VERSION: ${{ matrix.ruby }}
+        RUBY_VERSION: ${{ matrix.ruby-version }}
       run: |
         mkdir $RUBY_VERSION
         cd $RUBY_VERSION
