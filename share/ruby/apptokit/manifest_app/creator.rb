@@ -107,6 +107,13 @@ module Apptokit
       def yaml_manifest
         return @yaml_manifest if defined?(@yaml_manifest)
 
+        if !config.manifest_url && !config.manifest
+          raise ApptokitError.new(
+            "The current environment does not provide a manifest configuration"
+            type: :manifest_not_a_manifest
+          )
+        end
+
         @yaml_manifest = fetch_manifest_from_url if config.manifest_url
         @yaml_manifest = config.manifest
       end
