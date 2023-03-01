@@ -4,7 +4,6 @@
 require "setup"
 require "socket"
 require "pry"
-require 'pp'
 require "digest"
 
 port = (ENV["PORT"] || 8077).to_i

@@ -41,11 +41,8 @@ module Apptokit
     if auto_open? && ENV.key?("BROWSER")
       `$BROWSER #{url}`
     else
-      if prompt
-        $stderr.puts prompt
-      else
-        $stderr.puts "Please open the following URL in your browser:"
-      end
+      $stderr.puts prompt || "Please open the following URL in your browser:"
+
       $stderr.puts
       $stderr.puts url
       $stderr.puts
