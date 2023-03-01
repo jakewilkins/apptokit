@@ -28,4 +28,5 @@ jobs:
       run: |
         mkdir $RUBY_VERSION
         cd $RUBY_VERSION
+        gem install webrick
         rake -f ../test/Rakefile
