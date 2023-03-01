@@ -25,7 +25,7 @@ module Apptokit
     def create(conf_loader, cli_opts = {})
       cli_opts[:config] = conf_loader
 
-      app_creator = ManifestApp::Creator.new(cli_opts)
+      app_creator = ManifestApp::Creator.new(**cli_opts)
       settings = app_creator.create_app
 
       persist_to_cache(conf_loader.env, settings)
