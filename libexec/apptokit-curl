@@ -20,7 +20,7 @@ request_types=("app" "installation" "user" "pat")
 
 if [[ "$1" == "--complete" ]]; then
 
-  request_type="$(echo -e "${2}" | tr -d '[:space:]')" 
+  request_type="$(echo -e "${2}" | tr -d '[:space:]')"
   if [[ ! " ${request_types[@]} " =~ " ${request_type} " ]]; then
     for i in "${request_types[@]}"; do
        echo "$i"
@@ -28,7 +28,7 @@ if [[ "$1" == "--complete" ]]; then
     exit
   fi
 
-  request_method="$(echo -e "${3}" | tr -d '[:space:]')" 
+  request_method="$(echo -e "${3}" | tr -d '[:space:]')"
   if [[ ! " ${request_methods[@]} " =~ " ${request_method} " ]]; then
     echo "GET"
     echo "POST"
@@ -118,6 +118,17 @@ if [[ "$path" != *http* ]]; then
   path="$github_url$joiner$path"
 fi
 
+if [[ "$cookie" != "" ]]; then
+	cookie_arg=""
+	IFS=';' read -ra cookie_values <<< "$cookie"
+	for this_cookie in "${cookie_values[@]}"; do
+		# process "$i"
+		cookie_arg="$cookie_arg --cookie $this_cookie"
+	done
+else
+	cookie_arg=""
+fi
+
 USER_AGENT=${USER_AGENT:-$user_agent}
 
-curl $request_method --user-agent "$USER_AGENT" -H "Authorization: $auth" -H "Accept: $PREVIEW_HEADER" "$@" $path
+curl $request_method --user-agent "$USER_AGENT" $cookie_arg -H "Authorization: $auth" -H "Accept: $PREVIEW_HEADER" "$@" $path
