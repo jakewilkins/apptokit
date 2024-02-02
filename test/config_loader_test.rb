@@ -6,6 +6,7 @@ require "tempfile"
 class ConfigLoaderTest < TestCase
 
   def setup
+    reset!
     @loader = Apptokit::ConfigLoader.new
   end
 
@@ -16,7 +17,6 @@ class ConfigLoaderTest < TestCase
   end
 
   def test_loads_conf_from_project_dir
-    reset!
     write_local_config({'user_agent' => 'test'})
 
     @loader.reload!
