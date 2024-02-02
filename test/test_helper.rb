@@ -18,6 +18,8 @@ TEST_HOME_APPTOKIT_DIR.mkpath unless TEST_HOME_APPTOKIT_DIR.exist?
 
 ENV["HOME"] = TEST_HOME_DIR.to_s
 
+ENV["DEBUG"] = "config"
+
 require 'setup'
 
 module AssertionHelpers
