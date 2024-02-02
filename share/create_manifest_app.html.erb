@@ -27,6 +27,7 @@
   <body>
     <div id="outer">
       <div id="inner">
+        This App will be created on <pre><%= config.github_url.host %></pre>
         <label for="app-owner">Enter the organization name that will own the App (leave blank for the logged in user)</label>
         <br />
         <input type="text" name="app-owner" id="app-owner" placeholder="organization name" value="<%= config.app_owner %>">
