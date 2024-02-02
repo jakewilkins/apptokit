@@ -14,7 +14,7 @@ module Apptokit
     def self.environments
       envs = []
       [HOME_DIR_CONF_PATH, PROJECT_DIR_CONF_PATH].each do |path|
-        envs += (YAML.safe_load(path.read, aliases: true).keys - Apptokit::Configuration::YAML_OPTS) if path.exist?
+        envs += (YAML.safe_load(path.read, aliases: true, permitted_classes: [Symbol]).keys - Apptokit::Configuration::YAML_OPTS) if path.exist?
       end
       (envs - %w(default_env)).reject { |e| /_defaults/.match?(e) }
     end
@@ -151,7 +151,7 @@ module Apptokit
       yaml = if RUBY_VERSION < '2.6'
         YAML.load(path.read) # rubocop:disable Security/YAMLLoad
       else
-        YAML.safe_load(path.read, aliases: true)
+        YAML.safe_load(path.read, aliases: true, permitted_classes: [Symbol])
       end
       set_opts_from_hash(yaml)
 
