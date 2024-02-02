@@ -1,6 +1,16 @@
 
 require "rake/testtask"
 
+current_dir = File.basename(Dir.pwd)
+in_ci_build_dir = current_dir == ENV["RUBY_VERSION"]
+in_test_dir = current_dir == "test"
+
+$path_prefix = if in_ci_build_dir || in_test_dir
+  "../"
+else
+  ""
+end
+
 Rake::TestTask.new(:test) do |t|
   t.libs << "#{$path_prefix}test"
   t.libs << "#{$path_prefix}share/ruby"

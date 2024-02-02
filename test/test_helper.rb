@@ -20,17 +20,21 @@ ENV["HOME"] = TEST_HOME_DIR.to_s
 
 ENV["DEBUG"] = "config"
 
-current_dir = File.basename(Dir.pwd)
-in_ci_build_dir = current_dir == ENV["RUBY_VERSION"]
-in_test_dir = current_dir == "test"
+unless defined?(SETUP_SSH_RAN)
+  SETUP_SSH_RAN = true
 
-$path_prefix = if in_ci_build_dir || in_test_dir
-  "../"
-else
-  ""
+  current_dir = File.basename(Dir.pwd)
+  in_ci_build_dir = current_dir == ENV["RUBY_VERSION"]
+  in_test_dir = current_dir == "test"
+
+  $path_prefix = if in_ci_build_dir || in_test_dir
+    "../"
+  else
+    ""
+  end
+
+  system({"HOME" => ENV["HOME"]}, "#{$path_prefix}test/setup.sh")
 end
-
-system({"HOME" => ENV["HOME"]}, "#{$path_prefix}test/setup.sh")
 
 require 'setup'
 
