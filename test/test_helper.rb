@@ -33,7 +33,9 @@ unless defined?(SETUP_SSH_RAN)
     ""
   end
 
-  system({"HOME" => ENV["HOME"]}, "#{$path_prefix}test/setup.sh")
+  puts "Running setup.sh"
+
+  system({"HOME" => ENV["HOME"]}, "#{$path_prefix}test/setup.sh", exception: true)
 end
 
 require 'setup'
