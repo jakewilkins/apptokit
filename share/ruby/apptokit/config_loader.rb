@@ -114,7 +114,7 @@ module Apptokit
     def debug(msg = nil, &block)
       return unless debug?
 
-      msg = "#{msg ? "#{msg} " : ""}#{block.call}" if block
+      msg = "#{msg ? "#{msg} " : ''}#{block.call}" if block
 
       $stderr.puts msg
     end
