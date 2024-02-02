@@ -113,7 +113,7 @@ module Apptokit
 
     def debug(msg = nil, &block)
       return unless debug?
-      return block.call if block
+      msg = "#{msg} #{block.call}" if block
 
       $stderr.puts msg
     end
@@ -146,7 +146,10 @@ module Apptokit
     end
 
     def set_opts_from_yaml(path)
-      return unless path.exist?
+      unless path.exist?
+        debug { "Skipping load from non-existent file: '#{path}'" }
+        return
+      end
 
       yaml = if RUBY_VERSION < '2.6'
         YAML.load(path.read) # rubocop:disable Security/YAMLLoad
@@ -161,17 +164,17 @@ module Apptokit
       return unless env
 
       env_overrides = yaml[env]
-      debug { $stderr.puts "loading #{env} from #{path} #{env_overrides.inspect}" }
+      debug { "loading #{env} from #{path} #{env_overrides.inspect}" }
       set_opts_from_hash(env_overrides) if env_overrides
     end
 
     def set_opts_from_cached_manifest
-      debug { $stderr.puts "loading manifest if available for #{env} #{@config}" }
+      debug { "loading manifest if available for #{env} #{@config}" }
       manifest_settings, @manifest_data = ManifestApp.load_from_cache(self)
 
       return if @manifest_data == :unavailable
 
-      debug { $stderr.puts "loading cached manifest #{manifest_settings} #{@manifest_data}" }
+      debug { "loading cached manifest #{manifest_settings} #{@manifest_data}" }
       @config = @config.merge(manifest_settings)
     end
 
