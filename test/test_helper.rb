@@ -18,8 +18,6 @@ TEST_HOME_APPTOKIT_DIR.mkpath unless TEST_HOME_APPTOKIT_DIR.exist?
 
 ENV["HOME"] = TEST_HOME_DIR.to_s
 
-ENV["DEBUG"] = "config"
-
 unless defined?(SETUP_SSH_RAN)
   SETUP_SSH_RAN = true
 

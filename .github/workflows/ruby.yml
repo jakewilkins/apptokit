@@ -25,8 +25,6 @@ jobs:
         BATS_CLIENT_SECRET:  ${{ secrets.BATS_CLIENT_SECRET }}
         BATS_PRIVATE_KEY:  ${{ secrets.BATS_PRIVATE_KEY }}
         RUBY_VERSION: ${{ matrix.ruby-version }}
-        TEST: /home/runner/work/apptokit/apptokit/test/config_loader_test.rb
-        TESTOPTS: --name=test_loads_conf_from_project_dir -v
       run: |
         mkdir $RUBY_VERSION
         cd $RUBY_VERSION
