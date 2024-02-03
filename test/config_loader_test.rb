@@ -6,6 +6,7 @@ require "tempfile"
 class ConfigLoaderTest < TestCase
 
   def setup
+    reset!
     @loader = Apptokit::ConfigLoader.new
   end
 

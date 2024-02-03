@@ -1,5 +1,7 @@
 #!/bin/bash
 
+echo "Setting up home dir for tests: $HOME"
+
 mkdir -p ~/.config/apptokit
 
 this_dir=`basename $(pwd)`

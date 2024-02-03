@@ -11,11 +11,7 @@ else
   ""
 end
 
-task :env do |t|
-  system("#{$path_prefix}test/setup.sh")
-end
-
-Rake::TestTask.new(test: :env) do |t|
+Rake::TestTask.new(:test) do |t|
   t.libs << "#{$path_prefix}test"
   t.libs << "#{$path_prefix}share/ruby"
   t.test_files = FileList["#{$path_prefix}test/*_test.rb"]

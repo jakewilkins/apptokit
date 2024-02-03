@@ -18,6 +18,24 @@ TEST_HOME_APPTOKIT_DIR.mkpath unless TEST_HOME_APPTOKIT_DIR.exist?
 
 ENV["HOME"] = TEST_HOME_DIR.to_s
 
+unless defined?(SETUP_SSH_RAN)
+  SETUP_SSH_RAN = true
+
+  current_dir = File.basename(Dir.pwd)
+  in_ci_build_dir = current_dir == ENV["RUBY_VERSION"]
+  in_test_dir = current_dir == "test"
+
+  $path_prefix = if in_ci_build_dir || in_test_dir
+    "../"
+  else
+    ""
+  end
+
+  puts "Running setup.sh"
+
+  system({"HOME" => ENV["HOME"]}, "#{$path_prefix}test/setup.sh", exception: true)
+end
+
 require 'setup'
 
 module AssertionHelpers
