@@ -94,6 +94,7 @@ function install {
   export GEM_PATH="$LIB_DIR/share/ruby/vendor/ruby/${ruby_version_major}:${GEM_PATH}"
   export GEM_HOME="$LIB_DIR/share/ruby/vendor/ruby/${ruby_version_major}"
   gem install jwt 1>/dev/null
+  gem install webrick 1>/dev/null
 
   [ ! -f $BIN_DIR/$APP ] && $USE_SUDO ln -vs $LIB_DIR/libexec/$APP $BIN_DIR/$APP
 
