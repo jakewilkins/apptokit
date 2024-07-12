@@ -78,7 +78,7 @@ function install {
     git checkout $TAG
 
     for move in "${LIB_MOVES[@]}"; do
-      $USE_SUDO mv -v "$move" "$LIB_DIR/$move"
+      $USE_SUDO mv -fv "$move" "$LIB_DIR/$move"
     done
 
     popd
