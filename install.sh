@@ -87,7 +87,9 @@ function install {
 
     # FIXME - this link is kind of gross - but I'm leaving it so that
     # apptokit shell-setup works without changes.
-    $USE_SUDO ln -vs $LIB_DIR/libexec/$APP $LIB_DIR/bin/$APP
+    if [[ ! -f "$LIB_DIR/bin/$APP" ]]; then
+      $USE_SUDO ln -vs "$LIB_DIR/libexec/$APP" "$LIB_DIR/bin/$APP"
+    fi
   fi
 
   local ruby_version_major=$(ruby --disable-gems -e "print RUBY_VERSION.split('.').tap {|a| a[2] = '0'}.join('.')")
