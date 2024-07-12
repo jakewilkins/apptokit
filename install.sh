@@ -58,6 +58,7 @@ function install {
     if [ "$?" != "0" ]; then
       echo "'$BIN_DIR' is not writable as this user, please enter your password so we may use 'sudo' to write files:"
       sudo echo "Thanks!"
+      USE_SUDO="sudo"
     else
       rm "$BIN_DIR/testing-writeability-for-apptokit"
     fi
