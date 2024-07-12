@@ -78,6 +78,10 @@ function install {
     git checkout $TAG
 
     for move in "${LIB_MOVES[@]}"; do
+      if [[ -d "$LIB_DIR/$move" ]]; then
+        echo "Removing previously installed $move"
+        $USE_SUDO rm -r "$LIB_DIR/$move" 2>&1 >/dev/null
+      fi
       $USE_SUDO mv -fv "$move" "$LIB_DIR/$move"
     done
 
