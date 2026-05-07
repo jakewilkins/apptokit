@@ -6,8 +6,8 @@ require 'apptokit/callback_server'
 
 module Apptokit
   class UserToken
-    def self.generate(auto_open: true, code: nil, force: false, user: nil)
-      new(auto_open: auto_open, code: code, skip_cache: force, user: user).tap(&:generate)
+    def self.generate(auto_open: true, code: nil, force: false, user: nil, state: nil)
+      new(auto_open: auto_open, code: code, skip_cache: force, user: user, state: state).tap(&:generate)
     end
 
     def self.refresh(token:)
@@ -18,11 +18,11 @@ module Apptokit
       new(auto_open: auto_open, user: user).tap(&:get_code)
     end
 
-    attr_reader :auto_open, :installation_id, :mutex, :condition_variable, :skip_cache, :user, :oauth_code
+    attr_reader :auto_open, :installation_id, :mutex, :condition_variable, :skip_cache, :user, :oauth_code, :state
     attr_accessor :token, :token_type, :cached, :refresh_token, :expires_in, :refresh_token_expires_in, :error_description
     private :token=, :token_type=, :cached=
 
-    def initialize(installation_id: nil, auto_open: true, code: nil, skip_cache: false, user: nil, refresh_token: nil)
+    def initialize(installation_id: nil, auto_open: true, code: nil, skip_cache: false, user: nil, refresh_token: nil, state: nil)
       @installation_id = installation_id || Apptokit.config.installation_id
       @auto_open = auto_open.nil? ? true : auto_open
       @oauth_code = code
@@ -30,6 +30,7 @@ module Apptokit
       @cached = true
       @skip_cache = skip_cache
       @user = user
+      @state = state
       @mutex, @condition_variable = Mutex.new, ConditionVariable.new
     end
 
@@ -176,7 +177,9 @@ module Apptokit
     def oauth_url(callback_url)
       @oauth_url ||= begin
         login_value = user.nil? ? "" : "&login=#{user}"
-        "#{Apptokit.config.github_url}/login/oauth/authorize?client_id=#{client_id}#{login_value}&callback_url=#{callback_url}"
+        state_value = state.nil? ? "" : "&state=#{state}"
+        Apptokit.config.debug("Generating OAuth URL with client_id: #{client_id}, user: #{login_value}, state: #{state_value}")
+        "#{Apptokit.config.github_url}/login/oauth/authorize?client_id=#{client_id}#{login_value}#{state_value}&callback_url=#{callback_url}"
       end
     end
 

@@ -28,7 +28,7 @@ require "setup"
 require "apptokit/user_token"
 require 'optparse'
 
-options = { force: false, auto_open: true, user: nil, code: nil }
+options = { force: false, auto_open: true, user: nil, code: nil, state: nil }
 OptionParser.new do |opts|
   opts.on("-f", "--force", "Don't use a cached token")
 
@@ -41,6 +41,13 @@ OptionParser.new do |opts|
   opts.on("-g", "--get-code", "Authorize user for OAuth code from GitHub and exit")
 
   opts.on("-r [TOKEN]", "--refresh-token [TOKEN]", "The OAuth refresh token received from GitHub when access token is issued.")
+
+  opts.on("-sSTATE", "--state=STATE", "The OAuth state to use for the request")
+
+  opts.on("-h", "--help", "Show this help message") do
+    puts opts
+    exit 0
+  end
 end.parse!(into: options)
 
 DummyToken = Struct.new(:token) do
